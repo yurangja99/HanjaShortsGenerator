@@ -7,6 +7,7 @@
 ## How to use
 0. get your own [openai api key](https://platform.openai.com/account/api-keys) and save it in `keys.py`
 0. ```pip install -r requirements.txt```
+0. ```set GOOGLE_APPLICATION_CREDENTIALS=[GCP key location].json```
 0. ```python main.py [keyword]```
 
 ## Pipeline
@@ -82,6 +83,8 @@ ChatGPT와 KoAlpaca 모두 내가 제시한 대본 형식을 따르지 않거나
 ```
 
 ## TTS
+![Author](#author) 부분에서 작성한 대본을 Text-to-Speech 기술을 활용하여 음성으로 변환한다. 
+TTS 기술로는 ![GCP TTS](https://cloud.google.com/text-to-speech?hl=ko)를 이용하였다. 
 
 ## Image Generator
 
