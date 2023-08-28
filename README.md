@@ -5,7 +5,7 @@
 - selenium
 
 ## How to use
-0. get your own ![openai api key](https://platform.openai.com/account/api-keys) and save it in `keys.py`
+0. get your own [openai api key](https://platform.openai.com/account/api-keys) and save it in `keys.py`
 0. ```pip install -r requirements.txt```
 0. ```python main.py [keyword]```
 
@@ -35,7 +35,7 @@ flowchart TD
 0. 호스트가 사자성어의 유래를 이야기 형식으로 설명하며, 중간중간 등장 인물의 대사를 섞어 준다. 
 0. 호스트가 사자성어의 뜻과 유래를 통해 얻을 수 있는 교훈을 시청자들에게 설명하며 동영상이 끝난다. 
 
-대본 작성을 위한 기술로는 ![ChatGPT](https://chat.openai.com/)와 ![KoAlpaca](https://github.com/Beomi/KoAlpaca)를 고려하였다. 선택을 위해 내가 고려한 사항은 아래와 같다. 
+대본 작성을 위한 기술로는 [ChatGPT](https://chat.openai.com/)와 [KoAlpaca](https://github.com/Beomi/KoAlpaca)를 고려하였다. 선택을 위해 내가 고려한 사항은 아래와 같다. 
 
 ||ChatGPT|KoAlpaca|
 |-|-|-|
