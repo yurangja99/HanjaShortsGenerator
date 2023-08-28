@@ -30,7 +30,7 @@ class Crawler(object):
     
     # get hanja, mean, and story
     hanja = self.driver.find_element(By.CLASS_NAME, "hanja_mean")
-    mean = self.driver.find_element(By.XPATH, "//span[@class='mean']")
+    mean = self.driver.find_element(By.CLASS_NAME, "mean_list")
     story = self.driver.find_element(By.CLASS_NAME, "se_wrap")
     
     # print results
