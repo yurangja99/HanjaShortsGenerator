@@ -35,9 +35,10 @@ class Crawler(object):
     
     # print results
     print("Crawling Result:")
+    print("Keyword:", keyword)
     print("Hanja:", hanja.text)
     print("Mean:", mean.text)
     print("Story:", story.text)
     
-    return dict([("hanja", hanja.text), ("mean", mean.text), ("story", story.text)])
+    return dict([("keyword", keyword), ("hanja", hanja.text), ("mean", mean.text), ("story", story.text)])
   

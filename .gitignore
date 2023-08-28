@@ -160,3 +160,6 @@ cython_debug/
 #.idea/
 *.json
 *.mp3
+*.txt
+legacy/
+keys.py
