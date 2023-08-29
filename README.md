@@ -6,6 +6,7 @@
 
 ## How to use
 0. get your own [openai api key](https://platform.openai.com/account/api-keys) and save it in `keys.py`
+0. get pixabay, pexels api key and store it in `keys.py`
 0. ```set GOOGLE_APPLICATION_CREDENTIALS=[GCP key location].json```
 0. ```pip install -r requirements.txt```
 0. ```python main.py [keyword]```
@@ -91,6 +92,10 @@ TTS 기술로는 ![GCP TTS](https://cloud.google.com/text-to-speech?hl=ko)를 �
 해결해야 할 문제로는 음성의 성별을 선택하는 데 애로사항이 있다는 것이다. 호스트의 목소리는 여성으로 고정하였으나, 유래를 설명할 때 등장하는 인물의 성별을 판별하는 기능을 구축하지 못하였다. 고사성어의 대부분의 유래는 과거 시대 중국이 배경이므로 등장 인물의 목소리는 남자의 목소리로 가정하였으나, 휴리스틱한 방법이므로 수정이 꼭 필요하다. 
 
 ## Image Generator
+장면 1: Pixabay, Pexels에서 적절한 무료 사진/동영상을 가져온다.
+장면 2: 고정된 배경에 한자와 훈음, 사자성어의 뜻을 표기한다. 
+장면 3: Stable Diffusion을 통해 이야기에 맞는 이미지를 생성한다. 
+장면 4: Pixabay, Pexels에서 적절한 무료 사진/동영상을 가져온다. 
 
 ## Video Generator
 

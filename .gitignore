@@ -161,5 +161,9 @@ cython_debug/
 *.json
 *.mp3
 *.txt
+*.jpg
+*.png
+*.mp4
+*.ttf
 legacy/
 keys.py
