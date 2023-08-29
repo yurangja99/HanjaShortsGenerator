@@ -2,6 +2,7 @@ import argparse
 from keys import openai_api_key
 from crawler.crawler import Crawler
 from author.chatgpt import Author
+from splitter.splitter import Splitter
 
 parser = argparse.ArgumentParser()
 parser.add_argument("keyword", type=str, help="사자성어 혹은 고사성어")
@@ -17,3 +18,7 @@ if __name__ == "__main__":
   # generate script for video
   author = Author(openai_api_key)
   script = author.write_script(data, model=args.author_model, temperature=args.author_temp)
+  
+  # split script
+  splitter = Splitter()
+  splitted_script = splitter.split(script)
