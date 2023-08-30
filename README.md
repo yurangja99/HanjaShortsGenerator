@@ -6,8 +6,8 @@
 
 ## How to use
 0. get your own [openai api key](https://platform.openai.com/account/api-keys) and save it in `keys.py`
-0. ```pip install -r requirements.txt```
 0. ```set GOOGLE_APPLICATION_CREDENTIALS=[GCP key location].json```
+0. ```pip install -r requirements.txt```
 0. ```python main.py [keyword]```
 
 ## Pipeline
@@ -84,7 +84,11 @@ ChatGPT와 KoAlpaca 모두 내가 제시한 대본 형식을 따르지 않거나
 
 ## TTS
 ![Author](#author) 부분에서 작성한 대본을 Text-to-Speech 기술을 활용하여 음성으로 변환한다. 
-TTS 기술로는 ![GCP TTS](https://cloud.google.com/text-to-speech?hl=ko)를 이용하였다. 
+TTS 기술로는 ![GCP TTS](https://cloud.google.com/text-to-speech?hl=ko)를 이용하였다. 월 100만 토큰까지 무료로 제공하는 WaveNet을 사용하였다. WaveNet은 한국어로 2개의 여성 목소리와 2개의 남성 목소리를 제공한다. 이 프로젝트의 특성 상 더 많은 인물이 필요하지 않다고 생각하여 WaveNet을 우선 사용한다. 
+
+`TTS` 클래스는 `Splitter`의 반환값을 이용하여 음성을 제작한다. 등장 인물이 여러 명일 경우를 대비해 여러 개의 `Speaker` 인스턴스를 가지고 대본을 읽는다. 반환 형식은 위의 [scenes](#scenes)와 같으나, 각 대사마다 `audio_name`과 `duration` 필드가 추가되어 있다. 
+
+해결해야 할 문제로는 음성의 성별을 선택하는 데 애로사항이 있다는 것이다. 호스트의 목소리는 여성으로 고정하였으나, 유래를 설명할 때 등장하는 인물의 성별을 판별하는 기능을 구축하지 못하였다. 고사성어의 대부분의 유래는 과거 시대 중국이 배경이므로 등장 인물의 목소리는 남자의 목소리로 가정하였으나, 휴리스틱한 방법이므로 수정이 꼭 필요하다. 
 
 ## Image Generator
 

@@ -3,6 +3,7 @@ from keys import openai_api_key
 from crawler.crawler import Crawler
 from author.chatgpt import Author
 from splitter.splitter import Splitter
+from tts.tts import TTS
 
 parser = argparse.ArgumentParser()
 parser.add_argument("keyword", type=str, help="사자성어 혹은 고사성어")
@@ -21,4 +22,8 @@ if __name__ == "__main__":
   
   # split script
   splitter = Splitter()
-  splitted_script = splitter.split(script)
+  speakers, scenes = splitter.split(script)
+
+  # generate audio using TTS
+  tts = TTS(speakers)
+  scenes = tts.read_script(scenes)
