@@ -162,10 +162,14 @@ cython_debug/
 *.mp3
 *.txt
 *.jpg
+<<<<<<< HEAD
 *.jpeg
 *.png
 *.mp4
 *.ttf
+=======
+*.mp4
+>>>>>>> 6ff0a62 ((#editor) video edit part (without subtitle))
 legacy/
 keys.py
 

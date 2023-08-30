@@ -6,6 +6,7 @@ from author.author import Author
 from splitter.splitter import Splitter
 from tts.tts import TTS
 from image.imager import Imager
+from editor.editor import Editor
 
 parser = argparse.ArgumentParser()
 parser.add_argument("keyword", type=str, help="사자성어 혹은 고사성어")
@@ -20,6 +21,9 @@ parser.add_argument("--font", type=str, default="NanumGothicExtraBold.ttf", help
 parser.add_argument("--text-chinese-size", type=int, default=127, help="사자성어 소개 장면 한자 크기")
 parser.add_argument("--text-korean-size", type=int, default=36, help="사자성어 소개 장면 훈음 크기")
 parser.add_argument("--text-chinese-color", type=str, default="black", help="사자성어 소개 장면 한자 색")
+parser.add_argument("--fps", type=int, default=10, help="영상의 FPS")
+parser.add_argument("--text-size", type=int, default=14, help="자막 크기")
+parser.add_argument("--text-color", type=str, default="black", help="자막 색깔")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -65,3 +69,13 @@ if __name__ == "__main__":
     scenes=scenes,
     seed=args.sd_seed
   )
+  
+  # generate final video
+  editor = Editor(
+    target_resolution=(args.width, args.height), 
+    background_image=args.chalkboard, 
+    fps=args.fps, 
+    text_size=args.text_size, 
+    text_color=args.text_color
+  )
+  video_name = editor.edit_video(scenes, args.keyword)
