@@ -163,7 +163,10 @@ cython_debug/
 *.txt
 *.jpg
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.jpeg
+=======
+>>>>>>> 9e60222 ((#editor) add border to subtitles)
 *.png
 *.mp4
 *.ttf

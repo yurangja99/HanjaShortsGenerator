@@ -24,7 +24,9 @@ parser.add_argument("--text-chinese-color", type=str, default="black", help="사
 parser.add_argument("--fps", type=int, default=10, help="영상의 FPS")
 parser.add_argument("--font", type=str, default="NanumGothicExtraBold.ttf", help="자막 폰트 파일 위치")
 parser.add_argument("--text-size", type=int, default=32, help="자막 크기")
-parser.add_argument("--text-color", type=str, default="black", help="자막 색깔")
+parser.add_argument("--text-color", type=str, default="white", help="자막 색깔")
+parser.add_argument("--text-stroke-width", type=int, default=2, help="자막 가장자리 두께")
+parser.add_argument("--text-stroke-color", type=str, default="black", help="자막 가장자리 색깔")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -78,6 +80,8 @@ if __name__ == "__main__":
     fps=args.fps, 
     font=args.font, 
     text_size=args.text_size, 
-    text_color=args.text_color
+    text_color=args.text_color, 
+    text_stroke_width=args.text_stroke_width, 
+    text_stroke_color=args.text_stroke_color
   )
   video_name = editor.edit_video(scenes, args.keyword)

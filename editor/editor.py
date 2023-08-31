@@ -13,7 +13,9 @@ class Editor(object):
     fps: int, 
     font: str,
     text_size: int, 
-    text_color: str
+    text_color: str, 
+    text_stroke_width: int, 
+    text_stroke_color: str
   ):
     """
     Initialize Editor. 
@@ -25,6 +27,8 @@ class Editor(object):
         font (str): path to the font file. 
         text_size (int): size of the subtitle. 
         text_color (str): color of the subtitle. 
+        text_stroke_width (int): width of the stroke of the subtitle. 
+        text_stroke_color (str): color of the stroke of the subtitle.
     """
     self.target_resolution = target_resolution
     self.fps = fps
@@ -33,6 +37,8 @@ class Editor(object):
     self.text_color = text_color
     self.font = ImageFont.truetype(font, size=text_size)
     self.max_text_cnt = target_resolution[0] // text_size
+    self.text_stroke_width = text_stroke_width
+    self.text_stroke_color = text_stroke_color
   
   def __is_image(self, image_name: str):
     """
@@ -90,7 +96,7 @@ class Editor(object):
         for idx, line in enumerate(subtitle):
           x = self.target_resolution[0] / 2
           y = self.target_resolution[1] - self.text_size * (3 + 1.5 * (len(subtitle) - 1 - idx))
-          draw.text((x, y), line, self.text_color, self.font, "mm")
+          draw.text((x, y), line, self.text_color, self.font, "mm", stroke_width=self.text_stroke_width, stroke_fill=self.text_stroke_color)
         return np.array(frame)
       return fun
     
