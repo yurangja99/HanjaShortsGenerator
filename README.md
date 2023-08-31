@@ -8,6 +8,7 @@
 0. get your own [openai api key](https://platform.openai.com/account/api-keys) and save it in `keys.py`
 0. get pixabay, pexels api key and store it in `keys.py`
 0. ```set GOOGLE_APPLICATION_CREDENTIALS=[GCP key location].json```
+0. download your own Korean font (.ttf file)
 0. ```pip install -r requirements.txt```
 0. ```python main.py [keyword]```
 
@@ -156,3 +157,11 @@ Pexels와 Pixabay에서 영상 인트로와 아웃트로에 알맞은 이미지�
 moviepy를 활용하여 음성과 자료 화면을 합칠 수 있었고, 비디오 조각을 모아 하나의 동영상으로 만들 수 있었다. 
 
 다만, moviepy의 `TextClip`을 활용하여 자막을 넣는 것은 실패하였다. `TextClip` 관련 기능은 ImageMagick을 설치해야 사용할 수 있는데, 이를 설치함에도 불구하고 자막이 만들어지지 않는 오류가 반복되어 보류하였다. 대안으로는 OpenCV를 활용하여 자막만 추가하는 방안을 생각 중이다. 
+
+(Cont.) OpenCV를 이용하여 동영상에 텍스트를 삽입하려는 시도를 해 보았으나, 한글은 "???"로 나오는 오류가 발생하였다. 최종적으로는 pillow를 활용하여 각 프레임마다 알맞은 텍스트를 삽입하는 것으로 해결하였다. 
+
+대사의 길이가 웬만한 상황에서는 휴대폰의 가로 길이보다 훨씬 길기 때문에, 적절히 잘라 잘 표기하는 것이 중요하다. 따라서 휴대폰의 가로 길이보다 짧은 길이의 문장 조각으로 대사를 나누었다. 한 번에 두 개의 문장 조각이 표시되도록 설정하였다. (두 줄씩 출력) 
+
+하나의 대사를 두 개의 문장 조각씩 표시하므로 자막이 넘어가는 시간이 굉장히 중요하다. 문장 조각의 길이를 전체 시간을 나누는 가중치로 고려하여 동영상을 분할하는 방식을 사용하였다. 다만 단순히 문장 조각의 길이를 사용하는 것이 아니라 ".", "!", "?"로 끝나는 문장 조각에는 4글자가 더 있는 것으로 가정하였다. (Heuristic 방법) 실험 결과, 대략적으로 타이밍이 잘 맞는 것으로 보인다. 
+
+문장 조각마다 정확한 시간을 부여하는 방식으로 간단한 파이썬 TTS 모듈인 pyttsx3를 활용하는 방법도 있다. pyttsx3를 이용하여 각 문장 조각을 읽어 보고, 그 시간을 가중치로 이용하여 전체 동영상 시간을 나누는 방법을 생각 중이다. 

@@ -22,7 +22,8 @@ parser.add_argument("--text-chinese-size", type=int, default=127, help="사자�
 parser.add_argument("--text-korean-size", type=int, default=36, help="사자성어 소개 장면 훈음 크기")
 parser.add_argument("--text-chinese-color", type=str, default="black", help="사자성어 소개 장면 한자 색")
 parser.add_argument("--fps", type=int, default=10, help="영상의 FPS")
-parser.add_argument("--text-size", type=int, default=14, help="자막 크기")
+parser.add_argument("--font", type=str, default="NanumGothicExtraBold.ttf", help="자막 폰트 파일 위치")
+parser.add_argument("--text-size", type=int, default=32, help="자막 크기")
 parser.add_argument("--text-color", type=str, default="black", help="자막 색깔")
 args = parser.parse_args()
 
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     target_resolution=(args.width, args.height), 
     background_image=args.chalkboard, 
     fps=args.fps, 
+    font=args.font, 
     text_size=args.text_size, 
     text_color=args.text_color
   )
