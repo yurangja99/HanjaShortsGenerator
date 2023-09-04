@@ -167,3 +167,5 @@ cython_debug/
 *.ttf
 legacy/
 keys.py
+
+!background.png

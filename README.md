@@ -97,6 +97,21 @@ TTS 기술로는 ![GCP TTS](https://cloud.google.com/text-to-speech?hl=ko)를 �
 장면 3: Stable Diffusion을 통해 이야기에 맞는 이미지를 생성한다. 
 장면 4: Pixabay, Pexels에서 적절한 무료 사진/동영상을 가져온다. 
 
+### Image Constructor (장면 2)
+주어진 사진에 사자성어의 한자와 훈음을 표기하여 그 이미지를 저장하는 과정이다. (나는 칠판 사진을 배경으로 사용하였다.)
+
+이미지에 한자와 훈음을 추가하는 데에는 PILLOW를 사용하였다. 
+
+### Image Generator (장면 3)
+(TODO)
+
+### Image Parser (장면 1, 장면 4)
+Pexels와 Pixabay에서 영상 인트로와 아웃트로에 알맞은 이미지나 영상을 가져오는 역할을 한다. 
+
+각각의 스톡 사이트에서 여러 개의 이미지 및 영상을 가져 와 그 중 하나를 임의로 선택한다. 
+
+검색어는 Chat-GPT에 현재 대사에 대해 두 개의 단어를 추천해 달라고 하여 얻을 수 있었다. 
+
 ## Video Generator
 
 ## Editor
