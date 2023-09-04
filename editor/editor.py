@@ -4,12 +4,12 @@ from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.video.VideoClip import ImageClip
 from moviepy.editor import concatenate_videoclips, CompositeVideoClip
+from skimage.filters import gaussian
 
 class Editor(object):
   def __init__(
     self, 
     target_resolution: tuple, 
-    background_image: str, 
     fps: int, 
     font: str,
     text_size: int, 
@@ -22,7 +22,6 @@ class Editor(object):
 
     Args:
         target_resolution (tuple): (width, height) of the editted video. 
-        background_image (str): background image used to be letter box. 
         fps (int): fps of the video. 
         font (str): path to the font file. 
         text_size (int): size of the subtitle. 
@@ -32,7 +31,6 @@ class Editor(object):
     """
     self.target_resolution = target_resolution
     self.fps = fps
-    self.background_image = ImageClip(background_image).resize(target_resolution)
     self.text_size = text_size
     self.text_color = text_color
     self.font = ImageFont.truetype(font, size=text_size)
@@ -55,7 +53,7 @@ class Editor(object):
   def __fit_image_or_video_in_screen(self, image: ImageClip | VideoFileClip):
     """
     Fit given image or video into target resolution. 
-    Ratio will be kept during resizing, and rest of the part would be background image. 
+    Ratio will be kept during resizing, and rest of the part would be blurred image. 
 
     Args:
         image (ImageClip | VideoFileClip): image or video
@@ -65,18 +63,22 @@ class Editor(object):
     """
     # resize given image while keeping ratio
     if image.size[0] / image.size[1] > self.target_resolution[0] / self.target_resolution[1]:
-      image = image.resize(width=self.target_resolution[0])
+      height = image.size[1] * self.target_resolution[0] / image.size[0]
+      height = max(height, self.target_resolution[0])
     else:
-      image = image.resize(height=self.target_resolution[1])
+      height = self.target_resolution[1]
+    image = image.resize(height=height)
       
     # set image position: center
     image = image.set_position(("center", "center"))
     
     # set duration and position of the background
-    self.background_image = self.background_image.set_duration(image.duration)
+    background = image.resize(self.target_resolution)
+    background = background.fl_image(lambda frame: gaussian(frame.astype(float), sigma=8))
+    background = background.set_duration(image.duration)
     
     # composite with background image. 
-    return CompositeVideoClip([self.background_image, image])
+    return CompositeVideoClip([background, image])
     
   def __add_text_to_video(self, image: VideoFileClip, text: str):
     """
@@ -95,7 +97,8 @@ class Editor(object):
         draw = ImageDraw.Draw(frame)
         for idx, line in enumerate(subtitle):
           x = self.target_resolution[0] / 2
-          y = self.target_resolution[1] - self.text_size * (3 + 1.5 * (len(subtitle) - 1 - idx))
+          # y = self.target_resolution[1] - self.text_size * (3 + 1.5 * (len(subtitle) - 1 - idx))
+          y = self.target_resolution[1] / 2 + self.text_size * (idx * 1.5 - 0.75)
           draw.text((x, y), line, self.text_color, self.font, "mm", stroke_width=self.text_stroke_width, stroke_fill=self.text_stroke_color)
         return np.array(frame)
       return fun
