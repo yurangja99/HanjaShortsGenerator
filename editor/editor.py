@@ -99,7 +99,7 @@ class Editor(object):
           x = self.target_resolution[0] / 2
           # y = self.target_resolution[1] - self.text_size * (3 + 1.5 * (len(subtitle) - 1 - idx))
           # y = self.target_resolution[1] / 2 + self.text_size * (idx * 1.5 - 0.75)
-          y = self.target_resolution[1] * 0.73 + self.text_size * idx * 1.3
+          y = self.target_resolution[1] * 0.73 + self.text_size * idx * 1.4
           draw.text((x, y), line, self.text_color, self.font, "mm", stroke_width=self.text_stroke_width, stroke_fill=self.text_stroke_color)
         return np.array(frame)
       return fun
