@@ -1,7 +1,7 @@
 import argparse
 from keys import openai_api_key, pixabay_api_key, pexels_api_key
 from crawler.crawler import Crawler
-from author.chatgpt import Author
+from author.author import Author
 from splitter.splitter import Splitter
 from tts.tts import TTS
 from image.imager import Imager
