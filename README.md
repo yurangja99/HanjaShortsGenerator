@@ -65,6 +65,85 @@
 			--text-size 72
 		```
 
+## Regenerate Video
+이미 생성된 쇼츠 비디오의 내용이 마음에 들지 않아 바꾸고 싶다면, 비디오 생성 과정에서 생성된 `temp.json` 파일을 수정하여 다시 비디오를 생성할 수 있다. `temp.json`의 내용은 아래와 같다. 
+
+```json
+{
+  "data": {
+    "keyword": "우공이산",
+    "chinese": "愚公移山",
+    "hanja": "愚 어리석을 우 公 공평할 공 移 옮길 이 山 메 산",
+    "mean": "1. 「우공(愚公)이 산을 옮긴다.」는 말로, ...",
+    "story": "옛날, 중국(中國)의 북산(北山)에..."
+  },
+  "scripts": "장면 1\n호스트: 어떻게 보면 어리석은 일처럼 보이지만...",
+  "speakers": [
+    "호스트",
+    "우공"
+  ],
+  "scenes": [
+    [
+      {
+        "speaker": 0,
+        "content": "어떻게 보면...",
+        "audio_name": "우공이산-0-0.mp3",
+        "duration": 13.176,
+        "image_name": "우공이산-intro-0.jpeg"
+      }
+    ],
+    [
+      {
+        "speaker": 0,
+        "content": "우공이산. 어리석을 우, 공평할 공, 옮길 이, 산 메 산으로 이루어진 사자성어에요...",
+        "audio_name": "우공이산-1-0.mp3",
+        "duration": 14.496,
+        "image_name": "우공이산-hanja.png"
+      }
+    ],
+    [
+      {
+        "speaker": 0,
+        "content": "우공이산의 유래는 중국 북산에 우공이라는 90세 된 노인이 살고 있었어요.",
+        "audio_name": "우공이산-2-0.mp3",
+        "duration": 4.92,
+        "image_name": "우공이산-story-0.png"
+      },
+      {
+        "speaker": 0,
+        "content": "결국 천제의 감동을 받아 산은 다른 곳으로 옮겨지게 되었답니다.",
+        "audio_name": "우공이산-2-5.mp3",
+        "duration": 4.248,
+        "image_name": "우공이산-story-5.png"
+      }
+    ],
+    [
+      {
+        "speaker": 0,
+        "content": "우공이산은 우리에게 한 가지 일에 집중하고...",
+        "audio_name": "우공이산-3-0.mp3",
+        "duration": 13.2,
+        "image_name": "우공이산-outro-0.mp4"
+      },
+      {
+        "speaker": 0,
+        "content": "그래서 우리는 어떤 어려움이 있더라도...",
+        "audio_name": "우공이산-3-1.mp3",
+        "duration": 8.88,
+        "image_name": "우공이산-outro-1.mp4"
+      }
+    ]
+  ]
+}
+```
+
+파일의 내용을 원하는 대로 수정한 다음, 다시 스크립트를 실행한다. 이때 `--start-from` 옵션을 선택해 주어야 한다. 
+아래의 예시는 대본의 내용이 틀렸거나 수정하고 싶을 때 음성 생성, 이미지 생성, 영상 편집을 다시 수행하는 코드이다.
+
+```commandline
+python main.py 우공이산 --start-from scenes
+```
+
 ## Pipeline
 ```mermaid
 flowchart TD
@@ -203,7 +282,7 @@ Pexels와 Pixabay에서 영상 인트로와 아웃트로에 알맞은 이미지�
 |-|-|-|
 |어떻게 보면 어리석은 일처럼 보이지만 한 가지 일을 끝까지 밀고 나가면 언젠가는 목적을 달성할 수 있다고 생각해 본 적이 있으신가요? 오늘은 그런 상황을 나타내는 사자성어, "우공이산"에 대해 이야기해 볼까요?|stupid, perserverance|![](assets/parser1.jpg)|
 |"우공이산"은 우리에게 한 가지 일에 집중하고 끝까지 밀고 나가는 열정과 결단력의 중요성을 상기시켜줍니다. 어리석어 보일지라도 끝까지 노력하면 언젠가는 목적을 달성할 수 있다는 교훈이 담겨있어요.|concentration, perserverance|![](assets/parser2.jpg)|
-|그래서 우리는 어떤 어려움이 있더라도 포기하지 않고 열심히 노력하며 끝까지 밀고 나가는 자세를 가지는 것이 중요하다는 것을 기억해야 합니다.|perserverance, determination|![](assets/parser3.mp4)|
+|그래서 우리는 어떤 어려움이 있더라도 포기하지 않고 열심히 노력하며 끝까지 밀고 나가는 자세를 가지는 것이 중요하다는 것을 기억해야 합니다.|perserverance, determination|![](assets/parser3.gif)|
 
 ## Editor
 각 장면에 대한 음성과 자료 화면 (이미지 혹은 비디오) 이 모두 주어질 때 동영상을 편집하고 자막을 넣는 부분이다. 
