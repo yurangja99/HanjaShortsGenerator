@@ -3,7 +3,7 @@ from PIL import ImageFont, ImageDraw, Image
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.video.VideoClip import ImageClip
-from moviepy.editor import concatenate_videoclips, CompositeVideoClip
+from moviepy.editor import concatenate_videoclips, CompositeVideoClip, CompositeAudioClip
 from skimage.filters import gaussian
 
 class Editor(object):
@@ -188,7 +188,21 @@ class Editor(object):
     
     return video_name + ".mp4"
   
-  def edit_video(self, scenes: list, video_name: str):
+  def __add_bgm_to_video(self, video: VideoFileClip, bgm: str, bgm_vol: float):
+    # bgm
+    bgm = AudioFileClip(bgm)
+    bgm = bgm.volumex(bgm_vol)
+    if bgm.duration < video.duration:
+      bgm = bgm.loop(duration=video.duration)
+    else:
+      bgm = bgm.set_duration(video.duration)
+    
+    # compose bgm with audio of the video
+    audio = CompositeAudioClip([video.audio, bgm])
+    
+    return video.set_audio(audio)
+
+  def edit_video(self, scenes: list, video_name: str, bgm: str, bgm_vol: float):
     """
     Edit and save the final video. 
 
@@ -196,6 +210,8 @@ class Editor(object):
         scenes (list): returned value by Image/Video Generator. 
                        each line must have audio_name, video_name, and duration. 
         video_name (str): name of the final video. 
+        bgm (str): path to the background music.
+        bgm_vol (float): volume of the background music. 
     
     Return:
         return (str): returns video_name if no error occurred. 
@@ -209,6 +225,7 @@ class Editor(object):
     
     # make final video
     video = concatenate_videoclips(video_clips)
+    video = self.__add_bgm_to_video(video, bgm, bgm_vol)
     video.write_videofile(video_name + ".mp4")
     
     return video_name + ".mp4"

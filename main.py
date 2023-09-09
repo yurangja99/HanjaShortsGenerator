@@ -26,6 +26,8 @@ parser.add_argument("--text-size", type=int, default=36, help="자막 크기")
 parser.add_argument("--text-color", type=str, default="white", help="자막 색깔")
 parser.add_argument("--text-stroke-width", type=int, default=2, help="자막 가장자리 두께")
 parser.add_argument("--text-stroke-color", type=str, default="black", help="자막 가장자리 색깔")
+parser.add_argument("--bgm", type=str, default="bgm.mp3", help="영상 배경음악")
+parser.add_argument("--bgm-vol", type=float, default=0.2, help="영상 배경음악 볼륨 조절 (0.0 ~ 1.0)")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -82,4 +84,9 @@ if __name__ == "__main__":
     text_stroke_width=args.text_stroke_width, 
     text_stroke_color=args.text_stroke_color
   )
-  video_name = editor.edit_video(scenes, args.keyword)
+  video_name = editor.edit_video(
+    scenes=scenes, 
+    video_name=args.keyword,
+    bgm=args.bgm,
+    bgm_vol=args.bgm_vol
+  )

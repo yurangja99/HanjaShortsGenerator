@@ -170,4 +170,5 @@ legacy/
 keys.py
 
 !background.png
+!bgm.mp3
 !assets/**
