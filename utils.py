@@ -1,5 +1,6 @@
 import openai
 import time
+import json
 from openai.error import RateLimitError
 
 class ChatGPT(object):
@@ -16,9 +17,6 @@ class ChatGPT(object):
     self.model = model
     self.temperature = temperature
     self.sequential_error_cnt = 0
-    print("ChatGPT initialized with:")
-    print("Model:", self.model)
-    print("Temp:", self.temperature)
 
   def ask(self, messages: list):
     """
@@ -43,3 +41,46 @@ class ChatGPT(object):
       print(f"ChatGPT RateLimitError (occurred {self.sequential_error_cnt} times): try again in 20s.")
       time.sleep(20)
       return self.ask(messages)
+
+def save(data: dict | None, scripts: list | None, speakers: list | None, scenes: list | None):
+  """
+  Save data, scripts, speakers, and scenes in temp.json.
+
+  Args:
+      data (dict | None)
+      scripts (list | None)
+      speakers (list | None)
+      scenes (list | None)
+  """
+  # construct object
+  obj = {}
+  if data is not None:
+    obj["data"] = data
+  if scripts is not None:
+    obj["scripts"] = scripts
+  if speakers is not None:
+    obj["speakers"] = speakers
+  if scenes is not None:
+    obj["scenes"] = scenes
+  
+  # save data
+  with open("temp.json", "w", encoding="utf-8") as f:
+    json.dump(obj, f, indent=2, ensure_ascii=False)
+
+def load():
+  """
+  Load data, scripts, speakers, and scenes from temp.json
+
+  Returns:
+      tuple(dict, list, list, list): data, scripts, speakers, scenes
+  """
+  # load object
+  with open("temp.json", "r", encoding="utf-8") as f:
+    obj = json.load(f)
+  
+  # return values
+  data = obj["data"] if "data" in obj else None
+  scripts = obj["scripts"] if "scripts" in obj else None
+  speakers = obj["speakers"] if "speakers" in obj else None
+  scenes = obj["scenes"] if "scenes" in obj else None
+  return data, scripts, speakers, scenes

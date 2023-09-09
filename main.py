@@ -1,6 +1,7 @@
 import argparse
+from datetime import datetime
 from keys import openai_api_key, pixabay_api_key, pexels_api_key
-from utils import ChatGPT
+from utils import ChatGPT, save, load
 from crawler.crawler import Crawler
 from author.author import Author
 from splitter.splitter import Splitter
@@ -10,10 +11,11 @@ from editor.editor import Editor
 
 parser = argparse.ArgumentParser()
 parser.add_argument("keyword", type=str, help="사자성어 혹은 고사성어")
+parser.add_argument("--start-from", type=str, choices=["keyword", "data", "scripts", "scenes", "audios", "clips"], default="keyword", help="영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, clips: 대본, 오디오, 비디오부터)")
 parser.add_argument("--gpt-model", type=str, choices=["gpt-3.5-turbo"], default="gpt-3.5-turbo", help="ChatGPT 모델")
 parser.add_argument("--gpt-temp", type=float, default=0.7, help="ChatGPT 모델 창의성 (0.0 ~ 1.0)")
 parser.add_argument("--sd-model", type=str, choices=["CompVis/stable-diffusion-v1-4"], default="CompVis/stable-diffusion-v1-4", help="Stable Diffusion 모델")
-parser.add_argument("--sd-seed", type=int, default=42, help="Stable Diffusion seed값")
+parser.add_argument("--sd-seed", type=int, default=-1, help="Stable Diffusion seed값 (-1일 경우 random seed)")
 parser.add_argument("--width", type=int, default=450, help="영상의 가로 길이")
 parser.add_argument("--height", type=int, default=800, help="영상의 세로 길이")
 parser.add_argument("--chalkboard", type=str, default="background.png", help="사자성어 소개 장면 배경. default 값 그대로 쓰는 것을 추천.")
@@ -38,41 +40,65 @@ if __name__ == "__main__":
     temperature=args.gpt_temp
   )
   
-  # crawl data about the keyword
-  crawler = Crawler()
-  data = crawler.crawl(args.keyword)
+  if args.start_from in ["keyword"]:
+    # crawl data about the keyword
+    crawler = Crawler()
+    data = crawler.crawl(args.keyword)
+    save(data, None, None, None)
+  else:
+    data, _, _, _ = load()
   
-  # generate script for video
-  author = Author(gpt)
-  script = author.write_script(data)
-  
-  # split script
-  splitter = Splitter()
-  speakers, scenes = splitter.split(script)
+  if args.start_from in ["keyword", "data"]:
+    # generate script for video
+    author = Author(gpt)
+    scripts = author.write_script(data)
+    save(data, scripts, None, None)
+  else:
+    data, scripts, _, _ = load()
 
-  # generate audio using TTS
-  tts = TTS(speakers)
-  scenes = tts.read_script(scenes, data["keyword"])
+  if args.start_from in ["keyword", "data", "scripts"]:
+    # split script
+    splitter = Splitter()
+    speakers, scenes = splitter.split(scripts)
+    save(data, scripts, speakers, scenes)
+  else:
+    data, scripts, speakers, scenes = load()
+
+  if args.start_from in ["keyword", "data", "scripts", "scenes"]:
+    # generate audio using TTS
+    tts = TTS(speakers)
+    scenes = tts.read_script(scenes, data["keyword"])
+    save(data, scripts, speakers, scenes)
+  else:
+    data, scripts, speakers, scenes = load()
   
-  # parse or generate images or videos
-  imager = Imager(
-    gpt_model=gpt,
-    pexels_api_key=pexels_api_key,
-    pixabay_api_key=pixabay_api_key,
-    target_resolution=(args.width, args.height),
-    chalkboard=args.chalkboard,
-    font=args.font,
-    text_chinese_size=args.text_chinese_size,
-    text_korean_size=args.text_korean_size,
-    text_chinese_color=args.text_chinese_color,
-    sd_model=args.sd_model
-  )
-  scenes = imager.image(
-    data=data,
-    speakers=speakers,
-    scenes=scenes,
-    seed=args.sd_seed
-  )
+  if args.start_from in ["keyword", "data", "scripts", "scenes", "audios"]:
+    # if seed is -1, random seed
+    seed = args.sd_seed if args.sd_seed > -1 else int(datetime.now().timestamp())
+    print("Stable Diffusion seed:", seed)
+    
+    # parse or generate images or videos
+    imager = Imager(
+      gpt_model=gpt,
+      pexels_api_key=pexels_api_key,
+      pixabay_api_key=pixabay_api_key,
+      target_resolution=(args.width, args.height),
+      chalkboard=args.chalkboard,
+      font=args.font,
+      text_chinese_size=args.text_chinese_size,
+      text_korean_size=args.text_korean_size,
+      text_chinese_color=args.text_chinese_color,
+      sd_model=args.sd_model
+    )
+    scenes = imager.image(
+      data=data,
+      speakers=speakers,
+      scenes=scenes,
+      seed=seed
+    )
+    save(data, scripts, speakers, scenes)
+  else:
+    data, scripts, speakers, scenes = load()
   
   # generate final video
   editor = Editor(
