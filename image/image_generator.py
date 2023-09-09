@@ -5,17 +5,18 @@ import json
 from torch import autocast
 from diffusers import StableDiffusionPipeline
 from image.prompts import generator_instruction, generator_few_shot_samples, generator_positive_prompt, generator_negative_prompt
+from utils import ChatGPT
 
 class ImageGenerator(object):
-  def __init__(self, openai_api_key: str, sd_model: str="CompVis/stable-diffusion-v1-4"):
+  def __init__(self, gpt_model: ChatGPT, sd_model: str="CompVis/stable-diffusion-v1-4"):
     """
     Initialize image generator with Stable Diffusion model.
 
     Args:
-        openai_api_key (str): open api key. 
+        gpt_model (ChatGPT): gpt model
         sd_model (str, optional): name of Stable Diffusion model. Defaults to "CompVis/stable-diffusion-v1-4".
     """
-    openai.api_key = openai_api_key
+    self.gpt_model = gpt_model
     if torch.cuda.is_available():
       print("Image Generator in CUDA!")
       self.device = "cuda"
@@ -24,14 +25,12 @@ class ImageGenerator(object):
       self.device = "cpu"
     self.pipeline = StableDiffusionPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
   
-  def __depict_images(self, scripts: list, model: str, temperature: float):
+  def __depict_images(self, scripts: list):
     """
     With given list of dialogues, get over-all summary and instructions for each dialogue from chat-gpt. 
 
     Args:
         scripts (list): list of {"speaker": "content"}
-        model (str): chat-gpt model
-        temperature (float): creativity of chat-gpt model
 
     Returns:
         dict: {"summary": "", "instructions": [""]}
@@ -47,11 +46,7 @@ class ImageGenerator(object):
     messages += [{"role": "user", "content": "\n".join(scripts)}]
     
     # get explanation: JSON form
-    response = openai.ChatCompletion.create(
-      model=model,
-      messages=messages,
-      temperature=temperature
-    )
+    response = self.gpt_model.ask(messages)
     
     # verify result
     result = json.loads(response["choices"][0]["message"]["content"])
@@ -86,8 +81,8 @@ class ImageGenerator(object):
     with autocast(self.device):
       images = [
         self.pipeline(
-          #prompt=", ".join(generator_positive_prompt + ["Tale about " +  story["summary"], instruction]),
-          prompt=", ".join(generator_positive_prompt + [instruction]),
+          prompt=", ".join(generator_positive_prompt + ["Tale about " +  story["summary"], instruction]),
+          #prompt=", ".join(generator_positive_prompt + [instruction]),
           negative_prompt=", ".join(generator_negative_prompt),
           generator=torch.Generator(self.device).manual_seed(seed)
         ).images[0]
@@ -103,16 +98,20 @@ class ImageGenerator(object):
     
     return image_names
   
-  def generate_image(
-    self, 
-    scripts: list, 
-    image_name: str,
-    gpt_model: str="gpt-3.5-turbo", 
-    temperature: float=0.7, 
-    seed: int=42
-  ):
+  def generate_image(self, scripts: list, image_name: str, seed: int=42):
+    """
+    Generate images for given scripts (scene 3)
+
+    Args:
+        scripts (list): list of {"speaker": "content"}
+        image_name (str): image name to be saved
+        seed (int, optional): Stable Diffusion seed. Defaults to 42.
+
+    Returns:
+        list: list of saved image names
+    """
     # depict images using chat-gpt
-    story = self.__depict_images(scripts, gpt_model, temperature)
+    story = self.__depict_images(scripts)
     print("Image Generator Story:")
     print(story)
     

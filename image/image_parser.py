@@ -2,19 +2,20 @@ import openai
 import requests
 import random
 from image.prompts import parser_instruction, parser_few_shot_samples
+from utils import ChatGPT
 
 class ImageParser(object):
-  def __init__(self, openai_api_key: str, pexels_api_key: str | None, pixabay_api_key: str | None):
+  def __init__(self, gpt_model: ChatGPT, pexels_api_key: str | None, pixabay_api_key: str | None):
     """
     Initialize image parser. Needs API keys for openai, pexels, and pixabay. 
 
     Args:
-        openai_api_key (str): openai api key
+        gpt_model (ChatGPT): gpt model
         pexels_api_key (str | None): pexels api key
         pixabay_api_key (str | None): pixabay api key
     """
     # openai chatgpt
-    openai.api_key = openai_api_key
+    self.gpt_model = gpt_model
     
     # pixabay
     self.pixabay_api_key = pixabay_api_key
@@ -26,14 +27,12 @@ class ImageParser(object):
     self.pexels_image_endpoint = "https://api.pexels.com/v1/search/"
     self.pexels_video_endpoint = "https://api.pexels.com/videos/search/"
   
-  def __select_keywords(self, script: str, model: str, temperature: float):
+  def __select_keywords(self, script: str):
     """
     Ask chat-gpt to get two-word prompt for given script. 
 
     Args:
         script (str): script by the host
-        model (str): chat-gpt model name
-        temperature (float): chat-gpt's creativity
 
     Returns:
         str: two-word prompt by chat-gpt
@@ -49,12 +48,7 @@ class ImageParser(object):
     messages += [{"role": "user", "content": f"Script: {script}"}]
     
     # get keywords
-    response = openai.ChatCompletion.create(
-      model=model, 
-      messages=messages, 
-      temperature=temperature
-    )
-    
+    response = self.gpt_model.ask(messages)
     return response["choices"][0]["message"]["content"]
   
   def __parse_image_from_pixabay(self, query: str):
@@ -149,7 +143,7 @@ class ImageParser(object):
       
     return image_name + "." + ext
   
-  def parse_image(self, script: str, image_name: str, model: str="gpt-3.5-turbo", temperature: float=0.7):
+  def parse_image(self, script: str, image_name: str):
     """
     Get image from pixabay or pexels. 
 
@@ -160,7 +154,7 @@ class ImageParser(object):
         temperature (float, optional): chat-gpt creativity. Defaults to 0.7.
     """
     # get two words represent the given script
-    query = self.__select_keywords(script, model, temperature)
+    query = self.__select_keywords(script)
     print("Image Parser got script:", script)
     print("Image Parser query:", query)
     

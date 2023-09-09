@@ -1,27 +1,26 @@
 import openai
 import random
 from author.prompts import instruction, few_shot_samples
+from utils import ChatGPT
 
 class Author(object):
-  def __init__(self, openai_api_key: str):
+  def __init__(self, gpt_model: ChatGPT):
     """
     Initialize author that generates script. 
     It uses ChatGPT, so needs openai api key. 
 
     Args:
-        openai_api_key (str): openai api key
+        gpt_model (ChatGPT): gpt model
     """
     # authentication
-    openai.api_key = openai_api_key
+    self.gpt_model = gpt_model
   
-  def write_script(self, info: dict, model: str="gpt-3.5-turbo", temperature: float=0.7):
+  def write_script(self, info: dict):
     """
     Write script for given information. 
 
     Args:
         info (dict): dict consists of "keyword", "hanja", "mean", "story". 
-        model (str): gpt model name (default: gpt-3.5-turbo)
-        temperature (float): creativity of gpt model (default: 0.7)
         
     Return:
         return (str): script for given information. 
@@ -42,16 +41,11 @@ class Author(object):
     ]
   
     # get response from chatgpt api
-    response = openai.ChatCompletion.create(
-      model=model,  
-      messages=messages, 
-      temperature=temperature
-    )
+    response = self.gpt_model.ask(messages)
     
     # print result
     print("Author Result:")
     print("Model:", response["model"])
-    print("Temp:", temperature)
     print("Input Tokens:", response["usage"]["prompt_tokens"])
     print("Output Tokens:", response["usage"]["completion_tokens"])
     print("Script:")

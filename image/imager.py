@@ -2,11 +2,12 @@ import json
 from image.image_parser import ImageParser
 from image.image_constructor import ImageConstructor
 from image.image_generator import ImageGenerator
+from utils import ChatGPT
 
 class Imager(object):
   def __init__(
     self,
-    openai_api_key: str,
+    gpt_model: ChatGPT,
     pexels_api_key: str | None,
     pixabay_api_key: str | None,
     target_resolution: tuple,
@@ -21,7 +22,7 @@ class Imager(object):
     Class for parse, construct, or generate images or videos for shorts video. 
 
     Args:
-        openai_api_key (str): openai api key
+        gpt_model (ChatGPT): gpt model
         pexels_api_key (str | None): pexels api key
         pixabay_api_key (str | None): pixabay api key
         target_resolution (tuple): target resolution as (width, height)
@@ -34,7 +35,7 @@ class Imager(object):
     """
     # image parser
     self.image_parser = ImageParser(
-      openai_api_key=openai_api_key,
+      gpt_model=gpt_model,
       pexels_api_key=pexels_api_key,
       pixabay_api_key=pixabay_api_key
     )
@@ -51,11 +52,11 @@ class Imager(object):
     
     # image generator
     self.image_generator = ImageGenerator(
-      openai_api_key=openai_api_key,
+      gpt_model=gpt_model,
       sd_model=sd_model
     )
   
-  def image(self, data: dict, speakers: list, scenes: list, model: str, temperature: float, seed: int):
+  def image(self, data: dict, speakers: list, scenes: list, seed: int):
     """
     Parse, Construct, and Generate images for given script. 
     - parse images for scene 1 and 4. 
@@ -66,8 +67,6 @@ class Imager(object):
         data (dict): data returned by crawler. 
         speakers (list): speakers returned by splitter. 
         scenes (list): scenes returned by splitter, or tts. 
-        model (str): chat-gpt model
-        temperature (float): creativity of chat-gpt model
         seed (int): random seed for generator
 
     Returns:
@@ -81,16 +80,12 @@ class Imager(object):
     for idx, line in enumerate(scenes[0]):
       scenes[0][idx]["image_name"] = self.image_parser.parse_image(
         script=line["content"],
-        image_name=f"{data['keyword']}-intro-{idx}",
-        model=model,
-        temperature=temperature
+        image_name=f"{data['keyword']}-intro-{idx}"
       )
     for idx, line in enumerate(scenes[3]):
       scenes[3][idx]["image_name"] = self.image_parser.parse_image(
         script=line["content"],
-        image_name=f"{data['keyword']}-outro-{idx}",
-        model=model,
-        temperature=temperature
+        image_name=f"{data['keyword']}-outro-{idx}"
       )
     
     # scene 2: construct image
@@ -105,8 +100,6 @@ class Imager(object):
     generated_image_names = self.image_generator.generate_image(
       scripts=[speakers[line["speaker"]] + ": " + line["content"] for line in scenes[2]],
       image_name=f"{data['keyword']}-story",
-      gpt_model=model,
-      temperature=temperature,
       seed=seed
     )
     #assert len(generated_image_names) == len(scenes[3])
