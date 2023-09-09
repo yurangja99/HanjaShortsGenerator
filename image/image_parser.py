@@ -4,14 +4,14 @@ import random
 from image.prompts import parser_instruction, parser_few_shot_samples
 
 class ImageParser(object):
-  def __init__(self, openai_api_key: str, pexels_api_key: str, pixabay_api_key: str):
+  def __init__(self, openai_api_key: str, pexels_api_key: str | None, pixabay_api_key: str | None):
     """
     Initialize image parser. Needs API keys for openai, pexels, and pixabay. 
 
     Args:
         openai_api_key (str): openai api key
-        pexels_api_key (str): pexels api key
-        pixabay_api_key (str): pixabay api key
+        pexels_api_key (str | None): pexels api key
+        pixabay_api_key (str | None): pixabay api key
     """
     # openai chatgpt
     openai.api_key = openai_api_key
@@ -22,7 +22,7 @@ class ImageParser(object):
     self.pixabay_video_endpoint = "https://pixabay.com/api/videos/"
     
     # pexels
-    self.pexels_headers = {"Authorization": pexels_api_key}
+    self.pexels_headers = {"Authorization": pexels_api_key} if pexels_api_key else None
     self.pexels_image_endpoint = "https://api.pexels.com/v1/search/"
     self.pexels_video_endpoint = "https://api.pexels.com/videos/search/"
   
@@ -67,7 +67,7 @@ class ImageParser(object):
     Returns:
         dict: image object
     """
-    response = requests.get(self.pixabay_image_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5})
+    response = requests.get(self.pixabay_image_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5, "safesearch": "true"})
     response = response.json()
     return response["hits"]
   
@@ -81,7 +81,7 @@ class ImageParser(object):
     Returns:
         dict: video object
     """
-    response = requests.get(self.pixabay_video_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5})
+    response = requests.get(self.pixabay_video_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5, "safesearch": "true"})
     response = response.json()
     return response["hits"]
   
@@ -146,7 +146,9 @@ class ImageParser(object):
     response = requests.get(url, stream=True)
     with open(image_name + "." + ext, "wb") as f:
       f.write(response.content)
-    
+      
+    return image_name + "." + ext
+  
   def parse_image(self, script: str, image_name: str, model: str="gpt-3.5-turbo", temperature: float=0.7):
     """
     Get image from pixabay or pexels. 
@@ -159,16 +161,21 @@ class ImageParser(object):
     """
     # get two words represent the given script
     query = self.__select_keywords(script, model, temperature)
+    print("Image Parser got script:", script)
+    print("Image Parser query:", query)
     
     # parse images and videos from apis
     candidates = [
-      self.__parse_image_from_pixabay(query), 
-      self.__parse_video_from_pixabay(query), 
-      self.__parse_image_from_pexels(query), 
-      self.__parse_video_from_pexels(query)
+      self.__parse_image_from_pixabay(query) if self.pixabay_api_key else [], 
+      self.__parse_video_from_pixabay(query) if self.pixabay_api_key else [], 
+      self.__parse_image_from_pexels(query) if self.pexels_headers else [], 
+      self.__parse_video_from_pexels(query) if self.pexels_headers else []
     ]
+    print("Image Parser found:", [len(images) for images in candidates])
         
     # choose one randomly
     type = random.choices(range(len(candidates)), map(len, candidates))[0]
-    image = random.sample(candidates[type])
-    self.__download_image_or_video(image, type, image_name)
+    image = random.sample(candidates[type], 1)[0]
+    name = self.__download_image_or_video(image, type, image_name)
+    print("Image Parser saved Image:", name)
+    return name

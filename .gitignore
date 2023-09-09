@@ -162,6 +162,7 @@ cython_debug/
 *.mp3
 *.txt
 *.jpg
+*.jpeg
 *.png
 *.mp4
 *.ttf
@@ -169,3 +170,4 @@ legacy/
 keys.py
 
 !background.png
+!assets/**

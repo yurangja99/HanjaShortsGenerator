@@ -19,9 +19,7 @@ flowchart TD
 	A --Text: 대본--> S[Splitter]
 	S --Text: 구분된 대본--> G[Image Generator]
 	S --Text: 구분된 대본--> T[TTS]
-	G --Image: 이미지--> V[Video Generator]
-	T --Data: 음성 길이--> V
-	V --Video: 움직이는 이미지--> E([Editor])
+	G --Image: 이미지--> E([Editor])
 	T --Sound: 음성--> E
 	E --Video: 완성 동영상--> END(( ))
 ```
@@ -97,13 +95,48 @@ TTS 기술로는 ![GCP TTS](https://cloud.google.com/text-to-speech?hl=ko)를 �
 장면 3: Stable Diffusion을 통해 이야기에 맞는 이미지를 생성한다. 
 장면 4: Pixabay, Pexels에서 적절한 무료 사진/동영상을 가져온다. 
 
+이 단계에서는 세 가지 방법으로 이미지 혹은 비디오를 얻는다. 
+따라서 나는 세 가지 방법에 대해 각각 하나씩 클래스를 만들었고, 그 세 방법을 이용해 쇼츠 동영상을 위한 이미지 혹은 비디오 자료를 만들거나 얻는 `Imager` 클래스를 만들었다. 
+
+- `ImageConstructor`: 지정된 배경 사진에 사자성어의 한자와 훈음을 추가한 사진을 생성한다. 
+- `ImageGenerator`: 사자성어의 유래 이야기에 대해서 각 장면을 Stable Diffusion 모델을 이용하여 생성한다. 
+- `ImageParser`: Pixabay와 Pexels에서 적절한 무료 사진/동영상을 가져온다.
+
 ### Image Constructor (장면 2)
 주어진 사진에 사자성어의 한자와 훈음을 표기하여 그 이미지를 저장하는 과정이다. (나는 칠판 사진을 배경으로 사용하였다.)
 
 이미지에 한자와 훈음을 추가하는 데에는 PILLOW를 사용하였다. 
 
 ### Image Generator (장면 3)
-(TODO)
+사자성어 유래 이야기에 대해 전체 이야기의 줄거리와 각 장면에 대한 설명을 생성하도록 Chat-GPT에게 물어본다. 
+그 결과, 아래와 같은 형태의 설명을 얻을 수 있다.
+
+```json
+{
+	"summary": "determined old man successfully moving a mountain with his determination and hard work", 
+	"instructions": [
+		"a scenic view of a mountain range with an old man, around 90 years old, living in a small house", 
+		"an old man discussing with his family about his plan to flatten a mountain and create a road", 
+		"the old man starting to dig and move rocks and dirt with determination", 
+		"people laughing and mocking the old man's impossible task", 
+		"the old man persistently working on moving the mountain despite the ridicule", 
+		"a miraculous scene of the mountain being moved to another location by divine intervention"
+	]
+}
+```
+
+Stable Diffusion 모델에 전체적인 줄거리와 현재 장면에 대한 설명, 그리고 생성될 이미지의 특징 등을 입력하여 이미지를 생성한다. 
+Stable Diffusion 모델에 입력되는 프롬프트의 예시와 출력된 이미지 예시는 아래와 같다. 
+줄거리와 현재 상황에 대한 설명 외의 특징을 나타내는 프롬프트와 negative 프롬프트는 [prompts.py](image/prompts.py)에서 확인할 수 있다.
+
+|Summary|Instruction|Output|
+|-|-|-|
+|determined old man successfully moving a mountain with his determination and hard work|a scenic view of a mountain range with an old man, around 90 years old, living in a small house|![](assets/imager0.png)|
+|determined old man successfully moving a mountain with his determination and hard work|an old man discussing with his family about his plan to flatten a mountain and create a road|![](assets/imager1.png)|
+|determined old man successfully moving a mountain with his determination and hard work|the old man starting to dig and move rocks and dirt with determination|![](assets/imager2.png)|
+|determined old man successfully moving a mountain with his determination and hard work|people laughing and mocking the old man's impossible task|![](assets/imager3.png)|
+|determined old man successfully moving a mountain with his determination and hard work|the old man persistently working on moving the mountain despite the ridicule|![](assets/imager4.png)|
+|determined old man successfully moving a mountain with his determination and hard work|a miraculous scene of the mountain being moved to another location by divine intervention|![](assets/imager5.png)|
 
 ### Image Parser (장면 1, 장면 4)
 Pexels와 Pixabay에서 영상 인트로와 아웃트로에 알맞은 이미지나 영상을 가져오는 역할을 한다. 
@@ -112,6 +145,10 @@ Pexels와 Pixabay에서 영상 인트로와 아웃트로에 알맞은 이미지�
 
 검색어는 Chat-GPT에 현재 대사에 대해 두 개의 단어를 추천해 달라고 하여 얻을 수 있었다. 
 
-## Video Generator
+|Line|Keyword|Parsed Image|
+|-|-|-|
+|어떻게 보면 어리석은 일처럼 보이지만 한 가지 일을 끝까지 밀고 나가면 언젠가는 목적을 달성할 수 있다고 생각해 본 적이 있으신가요? 오늘은 그런 상황을 나타내는 사자성어, "우공이산"에 대해 이야기해 볼까요?|stupid, perserverance|![](assets/parser1.jpg)|
+|"우공이산"은 우리에게 한 가지 일에 집중하고 끝까지 밀고 나가는 열정과 결단력의 중요성을 상기시켜줍니다. 어리석어 보일지라도 끝까지 노력하면 언젠가는 목적을 달성할 수 있다는 교훈이 담겨있어요.|concentration, perserverance|![](assets/parser2.jpg)|
+|그래서 우리는 어떤 어려움이 있더라도 포기하지 않고 열심히 노력하며 끝까지 밀고 나가는 자세를 가지는 것이 중요하다는 것을 기억해야 합니다.|perserverance, determination|![](assets/parser3.mp4)|
 
 ## Editor

@@ -68,6 +68,8 @@ class ImageConstructor(object):
       draw.text((x, y_chinese), chinese[i], self.text_color, self.font_chinese, "mm")
       draw.text((x, y_korean), korean[i], self.text_color, self.font_korean, "mm")
     self.background_image.save(image_name + "." + self.ext, self.ext)
+    
+    return image_name + "." + self.ext
   
   def construct_image(self, hanja: str, image_name: str):
     """
@@ -83,5 +85,10 @@ class ImageConstructor(object):
     assert len(chinese) == 4
     assert len(korean) == 4
     
+    print("Image Constructor hanja:", chinese)
+    print("Image Constructor huneum:", korean)
+    
     # print them on the background image
-    self.__add_text_to_image_and_save(chinese, korean, image_name)
+    name = self.__add_text_to_image_and_save(chinese, korean, image_name)
+    print("Image Constructor saved image:", name)
+    return name
