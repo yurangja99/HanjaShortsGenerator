@@ -42,5 +42,7 @@ class Crawler(object):
     print("Mean:", mean.text)
     print("Story:", story.text)
     
+    self.driver.quit()
+    
     return dict([("keyword", keyword), ("chinese", chinese.text), ("hanja", hanja.text), ("mean", mean.text), ("story", story.text)])
   
