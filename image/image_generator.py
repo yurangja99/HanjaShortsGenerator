@@ -3,7 +3,7 @@ import openai
 import random
 import json
 from torch import autocast
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
 from image.prompts import generator_instruction, generator_few_shot_samples, generator_positive_prompt, generator_negative_prompt
 from utils import ChatGPT
 
@@ -24,6 +24,7 @@ class ImageGenerator(object):
       print("Image Generator in CPU!")
       self.device = "cpu"
     self.pipeline = StableDiffusionPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
+    #self.pipeline = StableDiffusionXLPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
   
   def __depict_images(self, scripts: list):
     """

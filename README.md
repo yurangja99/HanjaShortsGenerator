@@ -27,7 +27,7 @@
 			--gpt-model {gpt-3.5-turbo}
 														ChatGPT 모델
 			--gpt-temp GPT_TEMP   ChatGPT 모델 창의성 (0.0 ~ 1.0)
-			--sd-model {CompVis/stable-diffusion-v1-4}
+			--sd-model {CompVis/stable-diffusion-v1-4,runwayml/stable-diffusion-v1-5,stabilityai/stable-diffusion-2-1}
 														Stable Diffusion 모델
 			--sd-seed SD_SEED     Stable Diffusion seed값 (-1일 경우 random seed)
 			--width WIDTH         영상의 가로 길이
