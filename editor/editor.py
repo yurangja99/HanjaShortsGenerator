@@ -98,7 +98,8 @@ class Editor(object):
         for idx, line in enumerate(subtitle):
           x = self.target_resolution[0] / 2
           # y = self.target_resolution[1] - self.text_size * (3 + 1.5 * (len(subtitle) - 1 - idx))
-          y = self.target_resolution[1] / 2 + self.text_size * (idx * 1.5 - 0.75)
+          # y = self.target_resolution[1] / 2 + self.text_size * (idx * 1.5 - 0.75)
+          y = self.target_resolution[1] * 0.73 + self.text_size * idx * 1.3
           draw.text((x, y), line, self.text_color, self.font, "mm", stroke_width=self.text_stroke_width, stroke_fill=self.text_stroke_color)
         return np.array(frame)
       return fun
@@ -173,6 +174,7 @@ class Editor(object):
     
     # fit video into the screen
     image = self.__fit_image_or_video_in_screen(image)
+    image = image.set_duration(audio.duration)
     
     # add subtitles
     image = self.__add_text_to_video(image, line["content"])
@@ -202,7 +204,7 @@ class Editor(object):
     video_clips = []
     for scene_idx, scene in enumerate(scenes):
       for line_idx, line in enumerate(scene):
-        video_clip_name = self.__edit_image_or_video_with_audio(line=line, video_name=f"scene{scene_idx}_line{line_idx}")
+        video_clip_name = self.__edit_image_or_video_with_audio(line=line, video_name=f"{video_name}-{scene_idx}-{line_idx}")
         video_clips.append(VideoFileClip(video_clip_name))
     
     # make final video

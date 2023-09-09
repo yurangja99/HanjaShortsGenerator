@@ -53,8 +53,8 @@ generator_instruction = "\n".join([
   "You are a tale book author specialized in ancient Chinese tales.",
   "Please write detailed drawing instructions for panels of a new silent tale book page, and one-sentence overall summary of given Korean script.",
   "The story is read by '호스트', and contains dialogues of other characters.",
-  "Summary should include a major event of the story and character descriptions such as age and gender.",
-  #"An instruction corresponds to each line of the script, so number of instructions must be equal to the number of dialogues of the script.",
+  "Summary should include a major event of the story and character descriptions such as age and gender. Summary should less or equal to 77 characters.",
+  "An instruction corresponds to each line of the script, so number of instructions must be equal to the number of dialogues of the script.",
   "Give your response as a JSON array like this: `{ summary: string; instructions: Array<string> }`.",
   "Be brief in your summary and instructions, don't add your own comments. Be straight to the point, and never reply things like \"Sure, I can..\" etc."
 ])
