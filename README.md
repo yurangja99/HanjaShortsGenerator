@@ -10,7 +10,60 @@
 0. ```set GOOGLE_APPLICATION_CREDENTIALS=[GCP key location].json```
 0. download your own Korean font (.ttf file)
 0. ```pip install -r requirements.txt```
-0. ```python main.py [keyword]```
+0. run `main.py`
+	- usage
+		```commandline
+		usage: main.py [-h] [--start-from {keyword,data,scripts,scenes,audios,clips}] [--gpt-model {gpt-3.5-turbo}] [--gpt-temp GPT_TEMP] [--sd-model {CompVis/stable-diffusion-v1-4}] [--sd-seed SD_SEED] [--width WIDTH] [--height HEIGHT] [--chalkboard CHALKBOARD] [--font FONT] [--text-chinese-size TEXT_CHINESE_SIZE]
+								[--text-korean-size TEXT_KOREAN_SIZE] [--text-chinese-color TEXT_CHINESE_COLOR] [--fps FPS] [--text-size TEXT_SIZE] [--text-color TEXT_COLOR] [--text-stroke-width TEXT_STROKE_WIDTH] [--text-stroke-color TEXT_STROKE_COLOR] [--bgm BGM] [--bgm-vol BGM_VOL]
+								keyword
+		
+		positional arguments:
+			keyword               사자성어 혹은 고사성어
+
+		options:
+			-h, --help            show this help message and exit
+			--start-from {keyword,data,scripts,scenes,audios,clips}
+														영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, clips: 대본, 오디오, 비디오부터)
+			--gpt-model {gpt-3.5-turbo}
+														ChatGPT 모델
+			--gpt-temp GPT_TEMP   ChatGPT 모델 창의성 (0.0 ~ 1.0)
+			--sd-model {CompVis/stable-diffusion-v1-4}
+														Stable Diffusion 모델
+			--sd-seed SD_SEED     Stable Diffusion seed값 (-1일 경우 random seed)
+			--width WIDTH         영상의 가로 길이
+			--height HEIGHT       영상의 세로 길이
+			--chalkboard CHALKBOARD
+														사자성어 소개 장면 배경. default 값 그대로 쓰는 것을 추천.
+			--font FONT           자막 폰트 파일 위치
+			--text-chinese-size TEXT_CHINESE_SIZE
+														사자성어 소개 장면 한자 크기
+			--text-korean-size TEXT_KOREAN_SIZE
+														사자성어 소개 장면 훈음 크기
+			--text-chinese-color TEXT_CHINESE_COLOR
+														사자성어 소개 장면 한자 색
+			--fps FPS             영상의 FPS
+			--text-size TEXT_SIZE
+														자막 크기
+			--text-color TEXT_COLOR
+														자막 색깔
+			--text-stroke-width TEXT_STROKE_WIDTH
+														자막 가장자리 두께
+			--text-stroke-color TEXT_STROKE_COLOR
+														자막 가장자리 색깔
+			--bgm BGM             영상 배경음악
+			--bgm-vol BGM_VOL     영상 배경음악 볼륨 조절 (0.0 ~ 1.0)
+		```
+	- example
+		```commandline
+		python main.py 우공이산 ^
+			--sd-seed -1 ^
+			--width 900 ^
+			--height 1600 ^
+			--text-chinese-size 254 ^
+			--text-korean-size 72 ^
+			--fps 30 ^
+			--text-size 72
+		```
 
 ## Pipeline
 ```mermaid
