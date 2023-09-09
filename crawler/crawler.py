@@ -29,6 +29,7 @@ class Crawler(object):
     time.sleep(3)
     
     # get hanja, mean, and story
+    chinese = self.driver.find_element(By.CLASS_NAME, "u_word_dic")
     hanja = self.driver.find_element(By.CLASS_NAME, "hanja_mean")
     mean = self.driver.find_element(By.CLASS_NAME, "mean_list")
     story = self.driver.find_element(By.CLASS_NAME, "se_wrap")
@@ -36,9 +37,10 @@ class Crawler(object):
     # print results
     print("Crawling Result:")
     print("Keyword:", keyword)
+    print("Chinese:", chinese.text)
     print("Hanja:", hanja.text)
     print("Mean:", mean.text)
     print("Story:", story.text)
     
-    return dict([("keyword", keyword), ("hanja", hanja.text), ("mean", mean.text), ("story", story.text)])
+    return dict([("keyword", keyword), ("chinese", chinese.text), ("hanja", hanja.text), ("mean", mean.text), ("story", story.text)])
   

@@ -73,6 +73,7 @@ class Imager(object):
         list: scenes itself, with name of image files for each line. 
     """
     # verify data
+    assert "chinese" in data
     assert "hanja" in data
     assert "keyword" in data
     
@@ -90,6 +91,7 @@ class Imager(object):
     
     # scene 2: construct image
     constructed_image_name = self.image_constructor.construct_image(
+      raw_chinese=data["chinese"],
       hanja=data["hanja"],
       image_name=f"{data['keyword']}-hanja"
     )

@@ -32,11 +32,12 @@ class ImageConstructor(object):
     self.font_chinese = ImageFont.truetype(font, size=text_chinese_size)
     self.font_korean = ImageFont.truetype(font, size=text_korean_size)
   
-  def __parse(self, hanja: str):
+  def __parse(self, raw_chinese: str, hanja: str):
     """
     From raw text, parse chinese and korean characters. 
 
     Args:
+        raw_chinese (str): raw chinese characters
         hanja (str): raw text including chinese/korean characters
 
     Returns:
@@ -48,7 +49,7 @@ class ImageConstructor(object):
     # get korean: split by chinese characters
     korean = list(map(lambda s: s.strip(), re.split(f"[{chinese}]", hanja)[1:]))
     
-    return chinese, korean
+    return raw_chinese, [korean[chinese.find(ch)] for ch in raw_chinese]
   
   def __add_text_to_image_and_save(self, chinese: str, korean: list, image_name: str):
     """
@@ -71,16 +72,17 @@ class ImageConstructor(object):
     
     return image_name + "." + self.ext
   
-  def construct_image(self, hanja: str, image_name: str):
+  def construct_image(self, raw_chinese: str, hanja: str, image_name: str):
     """
     Parse, create, and save hanja image. 
 
     Args:
+        raw_chinese (str): raw chinese characters
         hanja (str): raw text including chinese/korean characters
         image_name (str): image name to be saved
     """
     # parse to chinese characters and korean hun-eum
-    chinese, korean = self.__parse(hanja)
+    chinese, korean = self.__parse(raw_chinese, hanja)
     
     assert len(chinese) == 4
     assert len(korean) == 4

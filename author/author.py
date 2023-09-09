@@ -27,6 +27,7 @@ class Author(object):
     """
     # verify info
     assert info["keyword"] is not None
+    assert info["chinese"] is not None
     assert info["hanja"] is not None
     assert info["mean"] is not None
     assert info["story"] is not None
@@ -37,7 +38,7 @@ class Author(object):
       {"role": "system", "content": instruction}, 
       {"role": "system", "name": "example_user", "content": one_shot_sample["prompt"]}, 
       {"role": "system", "name": "example_assistant", "content": one_shot_sample["completion"]}, 
-      {"role": "user", "content": f"사자성어: {info['keyword']}\n\n한자: {info['hanja']}\n\n의미: {info['mean']}\n\n유래: {info['story']}"}
+      {"role": "user", "content": f"사자성어: {info['keyword']}\n\n한자: {info['chinese']}\n\n훈음: {info['hanja']}\n\n의미: {info['mean']}\n\n유래: {info['story']}"}
     ]
   
     # get response from chatgpt api

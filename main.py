@@ -12,7 +12,7 @@ parser.add_argument("keyword", type=str, help="사자성어 혹은 고사성어"
 parser.add_argument("--gpt-model", type=str, choices=["gpt-3.5-turbo"], default="gpt-3.5-turbo", help="ChatGPT 모델")
 parser.add_argument("--gpt-temp", type=float, default=0.7, help="ChatGPT 모델 창의성 (0.0 ~ 1.0)")
 parser.add_argument("--sd-model", type=str, choices=["CompVis/stable-diffusion-v1-4"], default="CompVis/stable-diffusion-v1-4", help="Stable Diffusion 모델")
-parser.add_argument("--sd-seed", type=int, default=-1, help="Stable Diffusion seed값")
+parser.add_argument("--sd-seed", type=int, default=42, help="Stable Diffusion seed값")
 parser.add_argument("--width", type=int, default=450, help="영상의 가로 길이")
 parser.add_argument("--height", type=int, default=800, help="영상의 세로 길이")
 parser.add_argument("--chalkboard", type=str, default="background.png", help="사자성어 소개 장면 배경. default 값 그대로 쓰는 것을 추천.")
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
   # generate audio using TTS
   tts = TTS(speakers)
-  scenes = tts.read_script(scenes)
+  scenes = tts.read_script(scenes, data["keyword"])
   
   # parse or generate images or videos
   imager = Imager(
