@@ -42,13 +42,13 @@ class ChatGPT(object):
       time.sleep(20)
       return self.ask(messages)
 
-def save(data: dict | None, scripts: list | None, speakers: list | None, scenes: list | None):
+def save(data: dict | None, scripts: str | None, speakers: list | None, scenes: list | None):
   """
   Save data, scripts, speakers, and scenes in temp.json.
 
   Args:
       data (dict | None)
-      scripts (list | None)
+      scripts (str | None)
       speakers (list | None)
       scenes (list | None)
   """
@@ -72,7 +72,7 @@ def load():
   Load data, scripts, speakers, and scenes from temp.json
 
   Returns:
-      tuple(dict, list, list, list): data, scripts, speakers, scenes
+      tuple(dict, str, list, list): data, scripts, speakers, scenes
   """
   # load object
   with open("temp.json", "r", encoding="utf-8") as f:
