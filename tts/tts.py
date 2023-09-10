@@ -1,3 +1,4 @@
+import os
 from tts.speaker import Speaker
 
 class TTS(object):
@@ -16,13 +17,13 @@ class TTS(object):
     # initialize Speaker instances for each speaker
     self.speakers = [Speaker(names[i]) for i in range(len(speakers))]
   
-  def read_script(self, scenes: list, keyword: str):
+  def read_script(self, scenes: list, dirpath: str):
     """
     Synthesize audio for given scenes, and return it with additional info: audio file name and duration. 
 
     Args:
         scenes (list): scenes which is returned by Splitter
-        keyword (str): keyword. used to name of the saved audio
+        dirpath (str): path to save audio.
         
     Return:
         return (list): input itself with audio name and duration. 
@@ -32,7 +33,7 @@ class TTS(object):
     for scene_idx, scene in enumerate(scenes):
       read_scene = []
       for line_idx, line in enumerate(scene):
-        audio_name, duration = self.speakers[line["speaker"]].read(text=line["content"], audio_name=f"{keyword}-{scene_idx}-{line_idx}")
+        audio_name, duration = self.speakers[line["speaker"]].read(text=line["content"], audio_name=os.path.join(dirpath, f"audio-{scene_idx}-{line_idx}"))
         read_scene.append({
           "speaker": line["speaker"], 
           "content": line["content"], 

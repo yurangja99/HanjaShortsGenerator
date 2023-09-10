@@ -1,4 +1,5 @@
 import json
+import os
 from image.image_parser import ImageParser
 from image.image_constructor import ImageConstructor
 from image.image_generator import ImageGenerator
@@ -56,7 +57,7 @@ class Imager(object):
       sd_model=sd_model
     )
   
-  def image(self, data: dict, speakers: list, scenes: list, seed: int):
+  def image(self, data: dict, speakers: list, scenes: list, seed: int, dirpath: str):
     """
     Parse, Construct, and Generate images for given script. 
     - parse images for scene 1 and 4. 
@@ -68,6 +69,7 @@ class Imager(object):
         speakers (list): speakers returned by splitter. 
         scenes (list): scenes returned by splitter, or tts. 
         seed (int): random seed for generator
+        dirpath (str): path to save images
 
     Returns:
         list: scenes itself, with name of image files for each line. 
@@ -81,19 +83,19 @@ class Imager(object):
     for idx, line in enumerate(scenes[0]):
       scenes[0][idx]["image_name"] = self.image_parser.parse_image(
         script=line["content"],
-        image_name=f"{data['keyword']}-intro-{idx}"
+        image_name=os.path.join(dirpath, f"image-intro-{idx}")
       )
     for idx, line in enumerate(scenes[3]):
       scenes[3][idx]["image_name"] = self.image_parser.parse_image(
         script=line["content"],
-        image_name=f"{data['keyword']}-outro-{idx}"
+        image_name=os.path.join(dirpath, f"image-outro-{idx}")
       )
     
     # scene 2: construct image
     constructed_image_name = self.image_constructor.construct_image(
       raw_chinese=data["chinese"],
       hanja=data["hanja"],
-      image_name=f"{data['keyword']}-hanja"
+      image_name=os.path.join(dirpath, f"image-hanja")
     )
     for idx, line in enumerate(scenes[1]):
       scenes[1][idx]["image_name"] = constructed_image_name
@@ -101,7 +103,7 @@ class Imager(object):
     # scene 3: generate image
     generated_image_names = self.image_generator.generate_image(
       scripts=[speakers[line["speaker"]] + ": " + line["content"] for line in scenes[2]],
-      image_name=f"{data['keyword']}-story",
+      image_name=os.path.join(dirpath, f"image-story"),
       seed=seed
     )
     #assert len(generated_image_names) == len(scenes[3])

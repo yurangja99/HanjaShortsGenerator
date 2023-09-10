@@ -1,4 +1,5 @@
 import argparse
+import os
 from datetime import datetime
 from keys import openai_api_key, pixabay_api_key, pexels_api_key
 from utils import ChatGPT, save, load
@@ -34,6 +35,10 @@ parser.add_argument("--bgm-vol", type=float, default=0.2, help="영상 배경음
 args = parser.parse_args()
 
 if __name__ == "__main__":
+  # make output directory
+  dirpath = os.path.join("video_outputs", args.keyword)
+  os.makedirs(dirpath, exist_ok=True)
+
   # ChatGPT model
   gpt = ChatGPT(
     openai_api_key=openai_api_key,
@@ -45,33 +50,33 @@ if __name__ == "__main__":
     # crawl data about the keyword
     crawler = Crawler()
     data = crawler.crawl(args.keyword)
-    save(data, None, None, None)
+    save(dirpath, data, None, None, None)
   else:
-    data, _, _, _ = load()
+    data, _, _, _ = load(dirpath)
   
   if args.start_from in ["keyword", "data"]:
     # generate script for video
     author = Author(gpt)
     scripts = author.write_script(data)
-    save(data, scripts, None, None)
+    save(dirpath, data, scripts, None, None)
   else:
-    data, scripts, _, _ = load()
+    data, scripts, _, _ = load(dirpath)
 
   if args.start_from in ["keyword", "data", "scripts"]:
     # split script
     splitter = Splitter()
     speakers, scenes = splitter.split(scripts)
-    save(data, scripts, speakers, scenes)
+    save(dirpath, data, scripts, speakers, scenes)
   else:
-    data, scripts, speakers, scenes = load()
+    data, scripts, speakers, scenes = load(dirpath)
 
   if args.start_from in ["keyword", "data", "scripts", "scenes"]:
     # generate audio using TTS
     tts = TTS(speakers)
-    scenes = tts.read_script(scenes, data["keyword"])
-    save(data, scripts, speakers, scenes)
+    scenes = tts.read_script(scenes, dirpath)
+    save(dirpath, data, scripts, speakers, scenes)
   else:
-    data, scripts, speakers, scenes = load()
+    data, scripts, speakers, scenes = load(dirpath)
   
   if args.start_from in ["keyword", "data", "scripts", "scenes", "audios"]:
     # if seed is -1, random seed
@@ -95,11 +100,12 @@ if __name__ == "__main__":
       data=data,
       speakers=speakers,
       scenes=scenes,
-      seed=seed
+      seed=seed,
+      dirpath=dirpath
     )
-    save(data, scripts, speakers, scenes)
+    save(dirpath, data, scripts, speakers, scenes)
   else:
-    data, scripts, speakers, scenes = load()
+    data, scripts, speakers, scenes = load(dirpath)
   
   # generate final video
   editor = Editor(
@@ -113,7 +119,7 @@ if __name__ == "__main__":
   )
   video_name = editor.edit_video(
     scenes=scenes, 
-    video_name=args.keyword,
+    dirpath=dirpath,
     bgm=args.bgm,
     bgm_vol=args.bgm_vol
   )

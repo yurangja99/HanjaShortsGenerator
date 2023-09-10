@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from PIL import ImageFont, ImageDraw, Image
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
@@ -202,14 +203,14 @@ class Editor(object):
     
     return video.set_audio(audio)
 
-  def edit_video(self, scenes: list, video_name: str, bgm: str, bgm_vol: float):
+  def edit_video(self, scenes: list, dirpath: str, bgm: str, bgm_vol: float):
     """
     Edit and save the final video. 
 
     Args:
         scenes (list): returned value by Image/Video Generator. 
                        each line must have audio_name, video_name, and duration. 
-        video_name (str): name of the final video. 
+        dirpath (str): path of saved clips and video.
         bgm (str): path to the background music.
         bgm_vol (float): volume of the background music. 
     
@@ -220,12 +221,12 @@ class Editor(object):
     video_clips = []
     for scene_idx, scene in enumerate(scenes):
       for line_idx, line in enumerate(scene):
-        video_clip_name = self.__edit_image_or_video_with_audio(line=line, video_name=f"{video_name}-{scene_idx}-{line_idx}")
+        video_clip_name = self.__edit_image_or_video_with_audio(line=line, video_name=os.path.join(dirpath, f"clip-{scene_idx}-{line_idx}"))
         video_clips.append(VideoFileClip(video_clip_name))
     
     # make final video
     video = concatenate_videoclips(video_clips)
     video = self.__add_bgm_to_video(video, bgm, bgm_vol)
-    video.write_videofile(video_name + ".mp4")
+    video.write_videofile(os.path.join(dirpath, "video.mp4"))
     
-    return video_name + ".mp4"
+    return os.path.join(dirpath, "video.mp4")

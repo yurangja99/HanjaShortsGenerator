@@ -1,6 +1,7 @@
 import openai
 import time
 import json
+import os
 from openai.error import RateLimitError
 
 class ChatGPT(object):
@@ -42,11 +43,12 @@ class ChatGPT(object):
       time.sleep(20)
       return self.ask(messages)
 
-def save(data: dict | None, scripts: str | None, speakers: list | None, scenes: list | None):
+def save(dirpath: str, data: dict | None, scripts: str | None, speakers: list | None, scenes: list | None):
   """
   Save data, scripts, speakers, and scenes in temp.json.
 
   Args:
+      dirpath (str)
       data (dict | None)
       scripts (str | None)
       speakers (list | None)
@@ -64,18 +66,21 @@ def save(data: dict | None, scripts: str | None, speakers: list | None, scenes: 
     obj["scenes"] = scenes
   
   # save data
-  with open("temp.json", "w", encoding="utf-8") as f:
+  with open(os.path.join(dirpath, "temp.json"), "w", encoding="utf-8") as f:
     json.dump(obj, f, indent=2, ensure_ascii=False)
 
-def load():
+def load(dirpath: str):
   """
   Load data, scripts, speakers, and scenes from temp.json
+  
+  Args:
+      dirpath (str)
 
   Returns:
       tuple(dict, str, list, list): data, scripts, speakers, scenes
   """
   # load object
-  with open("temp.json", "r", encoding="utf-8") as f:
+  with open(os.path.join(dirpath, "temp.json"), "r", encoding="utf-8") as f:
     obj = json.load(f)
   
   # return values

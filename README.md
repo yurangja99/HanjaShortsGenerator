@@ -55,13 +55,27 @@
 		```
 	- example
 		```commandline
-		python main.py 우공이산 ^
+		# Windows
+		python main.py 사면초가 ^
+			--sd-model CompVis/stable-diffusion-v1-4 ^
 			--sd-seed -1 ^
 			--width 900 ^
 			--height 1600 ^
 			--text-chinese-size 254 ^
 			--text-korean-size 72 ^
 			--fps 30 ^
+			--text-size 72 ^
+			--start-from audios
+
+		# OSX
+		python main.py 우공이산 \
+			--sd-model CompVis/stable-diffusion-v1-4 \
+			--sd-seed -1 \
+			--width 900 \
+			--height 1600 \
+			--text-chinese-size 254 \
+			--text-korean-size 72 \
+			--fps 30 \
 			--text-size 72
 		```
 
