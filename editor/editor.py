@@ -3,8 +3,9 @@ import os
 from PIL import ImageFont, ImageDraw, Image
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.AudioClip import AudioClip
 from moviepy.video.VideoClip import ImageClip
-from moviepy.editor import concatenate_videoclips, CompositeVideoClip, CompositeAudioClip
+from moviepy.editor import concatenate_videoclips, concatenate_audioclips, CompositeVideoClip, CompositeAudioClip, afx
 from skimage.filters import gaussian
 
 class Editor(object):
@@ -131,8 +132,11 @@ class Editor(object):
     total_len = sum(map(get_subtitle_len, subtitles))
     start = 0
     end = 0
-    for subtitle in subtitles:
-      end = min(start + image.duration * (get_subtitle_len(subtitle) / total_len), image.duration)
+    for idx, subtitle in enumerate(subtitles):
+      if idx == len(subtitles) - 1:
+        end = image.duration
+      else:
+        end = min(start + image.duration * (get_subtitle_len(subtitle) / total_len), image.duration)
       sub_clip = image.subclip(start, end)
       sub_clip = sub_clip.fl_image(pipeline(subtitle))
       sub_clips.append(sub_clip)
@@ -142,14 +146,14 @@ class Editor(object):
   
   def __edit_image_or_video_with_audio(self, line: dict, video_name: str):
     """
-    Add a video to an audio, then save the video part. 
+    Add a video to an audio, then return a video clip.
 
     Args:
         line (dict): must have audio_name, image_name, and duration.
         video_name (str): name of the video. 
     
     Return:
-        return (str): video name. 
+        return (VideoClip): video clip. 
     """
     # validation
     assert line["audio_name"] is not None
@@ -158,6 +162,8 @@ class Editor(object):
     
     # audio clip
     audio = AudioFileClip(line["audio_name"])
+    audio = audio.subclip(0, audio.duration - 0.05)
+    audio = concatenate_audioclips([audio, AudioClip(lambda _: 0, duration=0.05)])
     
     # get image clip
     if self.__is_image(line["image_name"]):
@@ -175,7 +181,6 @@ class Editor(object):
     
     # fit video into the screen
     image = self.__fit_image_or_video_in_screen(image)
-    image = image.set_duration(audio.duration)
     
     # add subtitles
     image = self.__add_text_to_video(image, line["content"])
@@ -184,17 +189,14 @@ class Editor(object):
     video = image.set_audio(audio)
     video = video.set_fps(self.fps)
     
-    # save editted video
-    video.write_videofile(video_name + ".mp4")    
-    
-    return video_name + ".mp4"
+    return video
   
   def __add_bgm_to_video(self, video: VideoFileClip, bgm: str, bgm_vol: float):
     # bgm
     bgm = AudioFileClip(bgm)
     bgm = bgm.volumex(bgm_vol)
     if bgm.duration < video.duration:
-      bgm = bgm.loop(duration=video.duration)
+      bgm = afx.audio_loop(bgm, duration=video.duration)
     else:
       bgm = bgm.set_duration(video.duration)
     
@@ -221,8 +223,7 @@ class Editor(object):
     video_clips = []
     for scene_idx, scene in enumerate(scenes):
       for line_idx, line in enumerate(scene):
-        video_clip_name = self.__edit_image_or_video_with_audio(line=line, video_name=os.path.join(dirpath, f"clip-{scene_idx}-{line_idx}"))
-        video_clips.append(VideoFileClip(video_clip_name))
+        video_clips.append(self.__edit_image_or_video_with_audio(line=line, video_name=os.path.join(dirpath, f"clip-{scene_idx}-{line_idx}")))
     
     # make final video
     video = concatenate_videoclips(video_clips)

@@ -24,7 +24,7 @@ class Speaker(object):
     # Select the type of audio file you want returned
     self.audio_config = texttospeech.AudioConfig(
       audio_encoding=texttospeech.AudioEncoding.MP3, 
-      speaking_rate=1.15
+      speaking_rate=1.25
     )
   
   def read(self, text: str, audio_name: str):
