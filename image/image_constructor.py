@@ -44,12 +44,16 @@ class ImageConstructor(object):
         tuple(str, str): chinese characters, and list of korean hun-eum
     """
     # get chinese characters: exclude korean
-    chinese = re.sub(" +", " ", re.sub("[가-힣 ]", "", hanja))
+    chinese = re.sub(" +", " ", re.sub("[가-힣\(\) ]", "", hanja))
     
     # get korean: split by chinese characters
     korean = list(map(lambda s: s.strip(), re.split(f"[{chinese}]", hanja)[1:]))
     
-    return raw_chinese, [korean[chinese.find(ch)] for ch in raw_chinese]
+    assert len(chinese) == len(korean)
+    if len(chinese) == 4:
+      return raw_chinese, korean
+    else:
+      return raw_chinese, [korean[chinese.find(ch)] for ch in raw_chinese]
   
   def __add_text_to_image_and_save(self, chinese: str, korean: list, image_name: str):
     """
