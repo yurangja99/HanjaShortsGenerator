@@ -1,6 +1,8 @@
-import openai
+import time
 import requests
 import random
+import numpy as np
+from PIL import Image
 from image.prompts import parser_instruction, parser_few_shot_samples
 from utils import ChatGPT
 
@@ -21,11 +23,13 @@ class ImageParser(object):
     self.pixabay_api_key = pixabay_api_key
     self.pixabay_image_endpoint = "https://pixabay.com/api/"
     self.pixabay_video_endpoint = "https://pixabay.com/api/videos/"
+    self.pixabay_sequential_error_cnt = 0 # 100 per minute
     
     # pexels
     self.pexels_headers = {"Authorization": pexels_api_key} if pexels_api_key else None
     self.pexels_image_endpoint = "https://api.pexels.com/v1/search/"
     self.pexels_video_endpoint = "https://api.pexels.com/videos/search/"
+    self.pexels_sequential_error_cnt = 0 # 200 per hour, 20000 per month
   
   def __select_keywords(self, script: str):
     """
@@ -62,8 +66,19 @@ class ImageParser(object):
         dict: image object
     """
     response = requests.get(self.pixabay_image_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5, "safesearch": "true"})
-    response = response.json()
-    return response["hits"]
+    if response.status_code == 429:
+      self.pixabay_sequential_error_cnt += 1
+      if self.pixabay_sequential_error_cnt > 10:
+        print(f"Pixabay RateLimitError (occurred {self.pixabay_sequential_error_cnt} times): return empty list.")
+        return []
+      else:
+        print(f"Pixabay RateLimitError (occurred {self.pixabay_sequential_error_cnt} times): try again in 60s.")
+        time.sleep(60)
+        return self.__parse_image_from_pixabay(query)
+    else:
+      self.pixabay_sequential_error_cnt = 0
+      response = response.json()
+      return response["hits"]
   
   def __parse_video_from_pixabay(self, query: str):
     """
@@ -76,8 +91,19 @@ class ImageParser(object):
         dict: video object
     """
     response = requests.get(self.pixabay_video_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5, "safesearch": "true"})
-    response = response.json()
-    return response["hits"]
+    if response.status_code == 429:
+      self.pixabay_sequential_error_cnt += 1
+      if self.pixabay_sequential_error_cnt > 10:
+        print(f"Pixabay RateLimitError (occurred {self.pixabay_sequential_error_cnt} times): return empty list.")
+        return []
+      else:
+        print(f"Pixabay RateLimitError (occurred {self.pixabay_sequential_error_cnt} times): try again in 60s.")
+        time.sleep(60)
+        return self.__parse_video_from_pixabay(query)
+    else:
+      self.pixabay_sequential_error_cnt = 0
+      response = response.json()
+      return response["hits"]
   
   def __parse_image_from_pexels(self, query: str):
     """
@@ -90,8 +116,19 @@ class ImageParser(object):
         dict: image object
     """
     response = requests.get(self.pexels_image_endpoint, headers=self.pexels_headers, params={"query": query, "per_page": 5})
-    response = response.json()
-    return response["photos"]
+    if response.status_code == 429:
+      self.pexels_sequential_error_cnt += 1
+      if self.pexels_sequential_error_cnt > 10:
+        print(f"Pexels RateLimitError (occurred {self.pexels_sequential_error_cnt} times): return empty list.")
+        return []
+      else:
+        print(f"Pexels RateLimitError (occurred {self.pexels_sequential_error_cnt} times): try again in 180s.")
+        time.sleep(180)
+        return self.__parse_image_from_pexels(query)
+    else:
+      self.pexels_sequential_error_cnt = 0
+      response = response.json()
+      return response["photos"]
   
   def __parse_video_from_pexels(self, query: str):
     """
@@ -104,8 +141,19 @@ class ImageParser(object):
         dict: video object
     """
     response = requests.get(self.pexels_video_endpoint, headers=self.pexels_headers, params={"query": query, "per_page": 5})
-    response = response.json()
-    return response["videos"]
+    if response.status_code == 429:
+      self.pexels_sequential_error_cnt += 1
+      if self.pexels_sequential_error_cnt > 10:
+        print(f"Pexels RateLimitError (occurred {self.pexels_sequential_error_cnt} times): return empty list.")
+        return []
+      else:
+        print(f"Pexels RateLimitError (occurred {self.pexels_sequential_error_cnt} times): try again in 180s.")
+        time.sleep(180)
+        return self.__parse_video_from_pexels(query)
+    else:
+      self.pexels_sequential_error_cnt = 0
+      response = response.json()
+      return response["videos"]
   
   def __download_image_or_video(self, image: dict, type: int, image_name: str):
     """
@@ -168,8 +216,13 @@ class ImageParser(object):
     print("Image Parser found:", [len(images) for images in candidates])
         
     # choose one randomly
-    type = random.choices(range(len(candidates)), map(len, candidates))[0]
-    image = random.sample(candidates[type], 1)[0]
-    name = self.__download_image_or_video(image, type, image_name)
+    if sum(map(len, candidates)) > 0:
+      type = random.choices(range(len(candidates)), map(len, candidates))[0]
+      image = random.sample(candidates[type], 1)[0]
+      name = self.__download_image_or_video(image, type, image_name)
+    else:
+      Image.fromarray(np.zeros((32, 32), dtype=int), mode="RGB").save(f"{image_name}.png")
+      name = f"{image_name}.png"
+    
     print("Image Parser saved Image:", name)
     return name
