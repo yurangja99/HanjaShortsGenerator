@@ -25,6 +25,7 @@ class ImageGenerator(object):
       self.device = "cpu"
     self.pipeline = StableDiffusionPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
     #self.pipeline = StableDiffusionXLPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
+    print("Stable Diffusion model:", sd_model)
   
   def __depict_images(self, scripts: list):
     """
