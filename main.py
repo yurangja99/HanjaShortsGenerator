@@ -1,6 +1,5 @@
 import argparse
 import os
-from datetime import datetime
 from keys import openai_api_key, pixabay_api_key, pexels_api_key
 from utils import ChatGPT, save, load
 from crawler.crawler import Crawler
@@ -15,8 +14,8 @@ parser.add_argument("keyword", type=str, help="사자성어 혹은 고사성어"
 parser.add_argument("--start-from", type=str, choices=["keyword", "data", "scripts", "scenes", "audios", "clips"], default="keyword", help="영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, clips: 대본, 오디오, 비디오부터)")
 parser.add_argument("--gpt-model", type=str, choices=["gpt-3.5-turbo"], default="gpt-3.5-turbo", help="ChatGPT 모델")
 parser.add_argument("--gpt-temp", type=float, default=0.7, help="ChatGPT 모델 창의성 (0.0 ~ 1.0)")
-parser.add_argument("--sd-model", type=str, choices=["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5", "stabilityai/stable-diffusion-2-1"], default="CompVis/stable-diffusion-v1-4", help="Stable Diffusion 모델")
-#parser.add_argument("--sd-model", type=str, choices=["stabilityai/stable-diffusion-xl-base-1.0"], default="stabilityai/stable-diffusion-xl-base-1.0", help="Stable Diffusion 모델")
+#parser.add_argument("--sd-model", type=str, choices=["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5", "stabilityai/stable-diffusion-2-1"], default="CompVis/stable-diffusion-v1-4", help="Stable Diffusion 모델")
+parser.add_argument("--sd-model", type=str, choices=["stabilityai/stable-diffusion-xl-base-1.0"], default="stabilityai/stable-diffusion-xl-base-1.0", help="Stable Diffusion 모델")
 parser.add_argument("--sd-seed", type=int, default=-1, help="Stable Diffusion seed값 (-1일 경우 random seed)")
 parser.add_argument("--width", type=int, default=900, help="영상의 가로 길이")
 parser.add_argument("--height", type=int, default=1600, help="영상의 세로 길이")
@@ -79,10 +78,6 @@ if __name__ == "__main__":
     data, scripts, speakers, scenes = load(dirpath)
   
   if args.start_from in ["keyword", "data", "scripts", "scenes", "audios"]:
-    # if seed is -1, random seed
-    seed = args.sd_seed if args.sd_seed > -1 else int(datetime.now().timestamp())
-    print("Stable Diffusion seed:", seed)
-    
     # parse or generate images or videos
     imager = Imager(
       gpt_model=gpt,
@@ -100,7 +95,7 @@ if __name__ == "__main__":
       data=data,
       speakers=speakers,
       scenes=scenes,
-      seed=seed,
+      seed=args.sd_seed,
       dirpath=dirpath
     )
     save(dirpath, data, scripts, speakers, scenes)

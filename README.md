@@ -13,10 +13,9 @@
 0. run `main.py`
 	- usage
 		```commandline
-		usage: main.py [-h] [--start-from {keyword,data,scripts,scenes,audios,clips}] [--gpt-model {gpt-3.5-turbo}] [--gpt-temp GPT_TEMP] [--sd-model {CompVis/stable-diffusion-v1-4}] [--sd-seed SD_SEED] [--width WIDTH] [--height HEIGHT] [--chalkboard CHALKBOARD] [--font FONT] [--text-chinese-size TEXT_CHINESE_SIZE]
-								[--text-korean-size TEXT_KOREAN_SIZE] [--text-chinese-color TEXT_CHINESE_COLOR] [--fps FPS] [--text-size TEXT_SIZE] [--text-color TEXT_COLOR] [--text-stroke-width TEXT_STROKE_WIDTH] [--text-stroke-color TEXT_STROKE_COLOR] [--bgm BGM] [--bgm-vol BGM_VOL]
-								keyword
-		
+		usage: main.py [-h] [--start-from {keyword,data,scripts,scenes,audios,clips}] [--gpt-model {gpt-3.5-turbo}] [--gpt-temp GPT_TEMP] [--sd-model {stabilityai/stable-diffusion-xl-base-1.0}] [--sd-seed SD_SEED] [--width WIDTH] [--height HEIGHT] [--chalkboard CHALKBOARD] [--font FONT] [--text-chinese-size TEXT_CHINESE_SIZE] [--text-korean-size TEXT_KOREAN_SIZE] [--text-chinese-color TEXT_CHINESE_COLOR] [--fps FPS] [--text-size TEXT_SIZE] [--text-color TEXT_COLOR] [--text-stroke-width TEXT_STROKE_WIDTH] [--text-stroke-color TEXT_STROKE_COLOR] [--bgm BGM] [--bgm-vol BGM_VOL]
+		keyword
+
 		positional arguments:
 			keyword               사자성어 혹은 고사성어
 
@@ -27,7 +26,7 @@
 			--gpt-model {gpt-3.5-turbo}
 														ChatGPT 모델
 			--gpt-temp GPT_TEMP   ChatGPT 모델 창의성 (0.0 ~ 1.0)
-			--sd-model {CompVis/stable-diffusion-v1-4,runwayml/stable-diffusion-v1-5,stabilityai/stable-diffusion-2-1}
+			--sd-model {stabilityai/stable-diffusion-xl-base-1.0}
 														Stable Diffusion 모델
 			--sd-seed SD_SEED     Stable Diffusion seed값 (-1일 경우 random seed)
 			--width WIDTH         영상의 가로 길이

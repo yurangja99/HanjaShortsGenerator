@@ -1,8 +1,6 @@
 import torch
-import openai
 import random
 import json
-from torch import autocast
 from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
 from image.prompts import generator_instruction, generator_few_shot_samples, generator_positive_prompt, generator_negative_prompt
 from utils import ChatGPT
@@ -23,8 +21,8 @@ class ImageGenerator(object):
     else:
       print("Image Generator in CPU!")
       self.device = "cpu"
-    self.pipeline = StableDiffusionPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
-    #self.pipeline = StableDiffusionXLPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
+    #self.pipeline = StableDiffusionPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
+    self.pipeline = StableDiffusionXLPipeline.from_pretrained(sd_model, torch_dtype=torch.float16).to(self.device)
     print("Stable Diffusion model:", sd_model)
   
   def __depict_images(self, scripts: list):
@@ -80,16 +78,15 @@ class ImageGenerator(object):
     assert isinstance(story["instructions"], list)
     
     # generate images using summary and instructions of the story
-    with autocast(self.device):
-      images = [
-        self.pipeline(
-          prompt=", ".join(generator_positive_prompt + ["Tale about " +  story["summary"], instruction]),
-          #prompt=", ".join(generator_positive_prompt + [instruction]),
-          negative_prompt=", ".join(generator_negative_prompt),
-          generator=torch.Generator(self.device).manual_seed(seed)
-        ).images[0]
-        for instruction in story["instructions"]
-      ]
+    images = [
+      self.pipeline(
+        prompt=", ".join(["picture of a fairy tale about " + story["summary"]] + generator_positive_prompt + [instruction]),
+        #prompt=", ".join(generator_positive_prompt + [instruction]),
+        negative_prompt=", ".join(generator_negative_prompt),
+        generator=torch.Generator(self.device).manual_seed(seed) if seed > -1 else None
+      ).images[0]
+      for instruction in story["instructions"]
+    ]
     
     # save images
     image_names = []
