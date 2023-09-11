@@ -95,7 +95,7 @@ if __name__ == "__main__":
       data=data,
       speakers=speakers,
       scenes=scenes,
-      seed=args.sd_seed,
+      seed=args.sd_seed if args.sd_seed > -1 else None,
       dirpath=dirpath
     )
     save(dirpath, data, scripts, speakers, scenes)

@@ -57,7 +57,7 @@ class Imager(object):
       sd_model=sd_model
     )
   
-  def image(self, data: dict, speakers: list, scenes: list, seed: int, dirpath: str):
+  def image(self, data: dict, speakers: list, scenes: list, seed: int | None, dirpath: str):
     """
     Parse, Construct, and Generate images for given script. 
     - parse images for scene 1 and 4. 
@@ -68,7 +68,7 @@ class Imager(object):
         data (dict): data returned by crawler. 
         speakers (list): speakers returned by splitter. 
         scenes (list): scenes returned by splitter, or tts. 
-        seed (int): random seed for generator
+        seed (int): random seed for generator. None means random
         dirpath (str): path to save images
 
     Returns:

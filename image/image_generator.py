@@ -59,14 +59,14 @@ class ImageGenerator(object):
     
     return result
   
-  def __generate_images(self, story: dict, image_name: str, seed: int):
+  def __generate_images(self, story: dict, image_name: str, seed: int | None):
     """
     Generate images from over-all summary and instructions. 
 
     Args:
         story (dict): story returned by __depict_images()
         image_name (str): image name to be saved
-        seed (int): random seed for Stable Diffusion model
+        seed (int): random seed for Stable Diffusion model. None means random
 
     Returns:
         list: list of saved image names
@@ -83,7 +83,7 @@ class ImageGenerator(object):
         prompt=", ".join(["picture of a fairy tale about " + story["summary"]] + generator_positive_prompt + [instruction]),
         #prompt=", ".join(generator_positive_prompt + [instruction]),
         negative_prompt=", ".join(generator_negative_prompt),
-        generator=torch.Generator(self.device).manual_seed(seed) if seed > -1 else None
+        generator=torch.Generator(self.device).manual_seed(seed) if seed is not None else None
       ).images[0]
       for instruction in story["instructions"]
     ]
@@ -97,14 +97,14 @@ class ImageGenerator(object):
     
     return image_names
   
-  def generate_image(self, scripts: list, image_name: str, seed: int=42):
+  def generate_image(self, scripts: list, image_name: str, seed: int | None):
     """
     Generate images for given scripts (scene 3)
 
     Args:
         scripts (list): list of {"speaker": "content"}
         image_name (str): image name to be saved
-        seed (int, optional): Stable Diffusion seed. Defaults to 42.
+        seed (int, optional): Stable Diffusion seed. None means random
 
     Returns:
         list: list of saved image names
