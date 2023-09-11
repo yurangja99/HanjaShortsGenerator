@@ -57,7 +57,7 @@ class Imager(object):
       sd_model=sd_model
     )
   
-  def image(self, data: dict, speakers: list, scenes: list, seed: int | None, dirpath: str):
+  def image(self, data: dict, speakers: list, scenes: list, story: dict | None, seed: int | None, dirpath: str):
     """
     Parse, Construct, and Generate images for given script. 
     - parse images for scene 1 and 4. 
@@ -68,11 +68,13 @@ class Imager(object):
         data (dict): data returned by crawler. 
         speakers (list): speakers returned by splitter. 
         scenes (list): scenes returned by splitter, or tts. 
+        story (dict): if exists, use the image instructions.
         seed (int): random seed for generator. None means random
         dirpath (str): path to save images
 
     Returns:
         list: scenes itself, with name of image files for each line. 
+        dict: story or generated story
     """
     # verify data
     assert "chinese" in data
@@ -101,8 +103,12 @@ class Imager(object):
       scenes[1][idx]["image_name"] = constructed_image_name
     
     # scene 3: generate image
+    if story is None:
+      story = self.image_generator.generate_story(
+        scripts=[speakers[line["speaker"]] + ": " + line["content"] for line in scenes[2]],
+      )
     generated_image_names = self.image_generator.generate_image(
-      scripts=[speakers[line["speaker"]] + ": " + line["content"] for line in scenes[2]],
+      story=story,
       image_name=os.path.join(dirpath, f"image-story"),
       seed=seed
     )
@@ -112,4 +118,4 @@ class Imager(object):
       
     print("Imager Result:")
     print(json.dumps(scenes, indent=2, ensure_ascii=False))
-    return scenes
+    return scenes, story

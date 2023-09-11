@@ -11,7 +11,7 @@ from editor.editor import Editor
 
 parser = argparse.ArgumentParser()
 parser.add_argument("keyword", type=str, help="사자성어 혹은 고사성어")
-parser.add_argument("--start-from", type=str, choices=["keyword", "data", "scripts", "scenes", "audios", "clips"], default="keyword", help="영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, clips: 대본, 오디오, 비디오부터)")
+parser.add_argument("--start-from", type=str, choices=["keyword", "data", "scripts", "scenes", "audios", "story", "clips"], default="keyword", help="영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, story: 대본, 오디오, 이미지 설명부터, clips: 대본, 오디오, 비디오부터)")
 parser.add_argument("--gpt-model", type=str, choices=["gpt-3.5-turbo"], default="gpt-3.5-turbo", help="ChatGPT 모델")
 parser.add_argument("--gpt-temp", type=float, default=0.7, help="ChatGPT 모델 창의성 (0.0 ~ 1.0)")
 #parser.add_argument("--sd-model", type=str, choices=["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5", "stabilityai/stable-diffusion-2-1"], default="CompVis/stable-diffusion-v1-4", help="Stable Diffusion 모델")
@@ -49,35 +49,35 @@ if __name__ == "__main__":
     # crawl data about the keyword
     crawler = Crawler()
     data = crawler.crawl(args.keyword)
-    save(dirpath, data, None, None, None)
+    save(dirpath, data, None, None, None, None)
   else:
-    data, _, _, _ = load(dirpath)
+    data, _, _, _, _ = load(dirpath)
   
   if args.start_from in ["keyword", "data"]:
     # generate script for video
     author = Author(gpt)
     scripts = author.write_script(data)
-    save(dirpath, data, scripts, None, None)
+    save(dirpath, data, scripts, None, None, None)
   else:
-    data, scripts, _, _ = load(dirpath)
+    data, scripts, _, _, _ = load(dirpath)
 
   if args.start_from in ["keyword", "data", "scripts"]:
     # split script
     splitter = Splitter()
     speakers, scenes = splitter.split(scripts)
-    save(dirpath, data, scripts, speakers, scenes)
+    save(dirpath, data, scripts, speakers, scenes, None)
   else:
-    data, scripts, speakers, scenes = load(dirpath)
+    data, scripts, speakers, scenes, _ = load(dirpath)
 
   if args.start_from in ["keyword", "data", "scripts", "scenes"]:
     # generate audio using TTS
     tts = TTS(speakers)
     scenes = tts.read_script(scenes, dirpath)
-    save(dirpath, data, scripts, speakers, scenes)
+    save(dirpath, data, scripts, speakers, scenes, None)
   else:
-    data, scripts, speakers, scenes = load(dirpath)
+    data, scripts, speakers, scenes, story = load(dirpath)
   
-  if args.start_from in ["keyword", "data", "scripts", "scenes", "audios"]:
+  if args.start_from in ["keyword", "data", "scripts", "scenes", "audios", "story"]:
     # parse or generate images or videos
     imager = Imager(
       gpt_model=gpt,
@@ -91,16 +91,19 @@ if __name__ == "__main__":
       text_chinese_color=args.text_chinese_color,
       sd_model=args.sd_model
     )
-    scenes = imager.image(
+    if args.start_from not in ["story"]:
+      story = None
+    scenes, story = imager.image(
       data=data,
       speakers=speakers,
       scenes=scenes,
+      story=story,
       seed=args.sd_seed if args.sd_seed > -1 else None,
       dirpath=dirpath
     )
-    save(dirpath, data, scripts, speakers, scenes)
+    save(dirpath, data, scripts, speakers, scenes, story)
   else:
-    data, scripts, speakers, scenes = load(dirpath)
+    data, scripts, speakers, scenes, story = load(dirpath)
   
   # generate final video
   editor = Editor(

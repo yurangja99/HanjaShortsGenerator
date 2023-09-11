@@ -43,7 +43,7 @@ class ChatGPT(object):
       time.sleep(20)
       return self.ask(messages)
 
-def save(dirpath: str, data: dict | None, scripts: str | None, speakers: list | None, scenes: list | None):
+def save(dirpath: str, data: dict | None, scripts: str | None, speakers: list | None, scenes: list | None, story: dict | None):
   """
   Save data, scripts, speakers, and scenes in temp.json.
 
@@ -53,6 +53,7 @@ def save(dirpath: str, data: dict | None, scripts: str | None, speakers: list | 
       scripts (str | None)
       speakers (list | None)
       scenes (list | None)
+      story (list | None)
   """
   # construct object
   obj = {}
@@ -64,6 +65,8 @@ def save(dirpath: str, data: dict | None, scripts: str | None, speakers: list | 
     obj["speakers"] = speakers
   if scenes is not None:
     obj["scenes"] = scenes
+  if story is not None:
+    obj["story"] = story
   
   # save data
   with open(os.path.join(dirpath, "temp.json"), "w", encoding="utf-8") as f:
@@ -88,4 +91,5 @@ def load(dirpath: str):
   scripts = obj["scripts"] if "scripts" in obj else None
   speakers = obj["speakers"] if "speakers" in obj else None
   scenes = obj["scenes"] if "scenes" in obj else None
-  return data, scripts, speakers, scenes
+  story = obj["story"] if "story" in obj else None
+  return data, scripts, speakers, scenes, story

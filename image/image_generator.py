@@ -97,23 +97,34 @@ class ImageGenerator(object):
     
     return image_names
   
-  def generate_image(self, scripts: list, image_name: str, seed: int | None):
+  def generate_story(self, scripts: list):
     """
-    Generate images for given scripts (scene 3)
+    Generate story for given scripts (scene 3)
 
     Args:
         scripts (list): list of {"speaker": "content"}
+    
+    Returns:
+        dict: {"summary": "", "instructions": [""]}
+    """
+    # depict images using chat-gpt
+    story = self.__depict_images(scripts)
+    print("Image Generator Story:")
+    print(story)
+    return story
+    
+  def generate_image(self, story: dict, image_name: str, seed: int | None):
+    """
+    Generate images for given story
+
+    Args:
+        story (dict): story returned by generate_story()
         image_name (str): image name to be saved
         seed (int, optional): Stable Diffusion seed. None means random
 
     Returns:
         list: list of saved image names
     """
-    # depict images using chat-gpt
-    story = self.__depict_images(scripts)
-    print("Image Generator Story:")
-    print(story)
-    
     # generate and save images using stable diffusion
     print("Image Generating with seed ", seed)
     image_names = self.__generate_images(story, image_name, seed)
