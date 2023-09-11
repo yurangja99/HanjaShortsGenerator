@@ -65,7 +65,7 @@ class ImageParser(object):
     Returns:
         dict: image object
     """
-    response = requests.get(self.pixabay_image_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5, "safesearch": "true"})
+    response = requests.get(self.pixabay_image_endpoint, params={"key": self.pixabay_api_key, "q": query, "per_page": 5, "safesearch": "true", "image_type": "photo"})
     if response.status_code == 429:
       self.pixabay_sequential_error_cnt += 1
       if self.pixabay_sequential_error_cnt > 10:
