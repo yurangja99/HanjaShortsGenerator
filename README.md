@@ -1,19 +1,43 @@
 # HanjaShortsGenerator
 
+## Examples
+Examples of shorts videos made from automated pipeline. 
+There might some weird points in these videos, because they're generated automatically. 
+You can edit what you want and regenerate the video, as explained [here](#regenerate-video). 
+|괄목상대|어부지리|
+|-|-|
+|[![](assets/괄목상대.gif)](assets/괄목상대.mp4)|[![](assets/어부지리.gif)](assets/어부지리.mp4)|
+
 ## Environment
+- windows 10
 - python 3.11.4
-- selenium
+- selenium 4.11.2
+- openai 0.27.9
+- google-api-core 2.11.1
+- google-cloud-texttospeech 2.14.1
+- pillow 9.3.0
+- diffusers 0.20.2
+- moviepy 1.0.3
 
 ## How to use
-0. get your own [openai api key](https://platform.openai.com/account/api-keys) and save it in `keys.py`
-0. get pixabay, pexels api key and store it in `keys.py`
-0. ```set GOOGLE_APPLICATION_CREDENTIALS=[GCP key location].json```
-0. download your own Korean font (.ttf file)
-0. ```pip install -r requirements.txt```
+0. make your own GCP project and get json key file. 
+0. set environment variables for GCP: `set GOOGLE_APPLICATION_CREDENTIALS=[GCP_KEY_LOCATION].json`
+0. get your own API keys for:
+	- openai API
+	- pixabay API
+	- pexels API
+0. make `keys.py` with your API keys and save it in project root:
+	```python
+	openai_api_key = "XXX"
+	pixabay_api_key = "XXX"
+	pexels_api_key = "XXX"
+	```
+0. download your own Korean font as `.ttf` file.
+0. install requirements: `pip install -r requirements.txt`
 0. run `main.py`
 	- usage
 		```commandline
-		usage: main.py [-h] [--start-from {keyword,data,scripts,scenes,audios,clips}] [--gpt-model {gpt-3.5-turbo}] [--gpt-temp GPT_TEMP] [--sd-model {stabilityai/stable-diffusion-xl-base-1.0}] [--sd-seed SD_SEED] [--width WIDTH] [--height HEIGHT] [--chalkboard CHALKBOARD] [--font FONT] [--text-chinese-size TEXT_CHINESE_SIZE] [--text-korean-size TEXT_KOREAN_SIZE] [--text-chinese-color TEXT_CHINESE_COLOR] [--fps FPS] [--text-size TEXT_SIZE] [--text-color TEXT_COLOR] [--text-stroke-width TEXT_STROKE_WIDTH] [--text-stroke-color TEXT_STROKE_COLOR] [--bgm BGM] [--bgm-vol BGM_VOL]
+		usage: main.py [-h] [--start-from {keyword,data,scripts,scenes,audios,story,clips}] [--gpt-model {gpt-3.5-turbo}] [--gpt-temp GPT_TEMP] [--sd-model {stabilityai/stable-diffusion-xl-base-1.0}] [--sd-seed SD_SEED] [--width WIDTH] [--height HEIGHT] [--chalkboard CHALKBOARD] [--font FONT] [--text-chinese-size TEXT_CHINESE_SIZE] [--text-korean-size TEXT_KOREAN_SIZE] [--text-chinese-color TEXT_CHINESE_COLOR] [--fps FPS] [--text-size TEXT_SIZE] [--text-color TEXT_COLOR] [--text-stroke-width TEXT_STROKE_WIDTH] [--text-stroke-color TEXT_STROKE_COLOR] [--bgm BGM] [--bgm-vol BGM_VOL]  
 		keyword
 
 		positional arguments:
@@ -21,8 +45,8 @@
 
 		options:
 			-h, --help            show this help message and exit
-			--start-from {keyword,data,scripts,scenes,audios,clips}
-														영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, clips: 대본, 오디오, 비디오부터)
+			--start-from {keyword,data,scripts,scenes,audios,story,clips}
+														영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, story: 대본, 오디오, 이미지 설명부터, clips: 대본, 오디오, 비디오부터)
 			--gpt-model {gpt-3.5-turbo}
 														ChatGPT 모델
 			--gpt-temp GPT_TEMP   ChatGPT 모델 창의성 (0.0 ~ 1.0)
@@ -56,8 +80,6 @@
 		```commandline
 		# Windows
 		python main.py 사면초가 ^
-			--sd-model CompVis/stable-diffusion-v1-4 ^
-			--sd-seed -1 ^
 			--width 900 ^
 			--height 1600 ^
 			--text-chinese-size 254 ^
@@ -68,8 +90,6 @@
 
 		# OSX
 		python main.py 우공이산 \
-			--sd-model CompVis/stable-diffusion-v1-4 \
-			--sd-seed -1 \
 			--width 900 \
 			--height 1600 \
 			--text-chinese-size 254 \
@@ -84,69 +104,100 @@
 ```json
 {
   "data": {
-    "keyword": "우공이산",
-    "chinese": "愚公移山",
-    "hanja": "愚 어리석을 우 公 공평할 공 移 옮길 이 山 메 산",
-    "mean": "1. 「우공(愚公)이 산을 옮긴다.」는 말로, ...",
-    "story": "옛날, 중국(中國)의 북산(北山)에..."
+    "keyword": "어부지리",
+    "chinese": "漁夫之利",
+    "hanja": "漁 고기 잡을 어 夫 지아비 부 之 갈 지 利 이로울 리(이)",
+    "mean": "1. 「어부(漁夫)의 이익(利益)」이라는 뜻으로, 「둘이 다투는 틈을 타서 엉뚱한 제3자(第三者)가 이익(利益)을 가로챔.」을 이르는 말.",
+    "story": "전국시대(戰國時代) 진나라(秦--)는 여러 나라를 병탄(竝呑ㆍ倂呑)하여 천하(天下)를 제압(制壓)하려고 했다. 이때 조나라(趙--)와 연나라(燕--) 사이에 마찰(摩擦)이 생겨, 조나라(趙--)는 연나라(燕--)를 침략(侵略)하고자 준비(準備)를 서둘렀다. 그래서 연나라(燕--) 소왕(昭王)은 소대(蘇代)를 조나라(趙--)에 보내어 혜왕(惠王)을 설득(說得)하도록 했다. 조나라(趙--)에 도착(到着)한 소대(蘇代)는 한 가지 예를 들어 혜왕(惠王)을 설득(說得)했다. 「제가 이 나라에 들어올 때, 역수(易水)를 지나다가 우연(偶然)히 냇가를 보니 조개가 입을 벌리고 볕을 쬐고 있었는데, 황새 한 마리가 날아와 조개를 쪼자, 조개는 급히 입을 꽉다물어 버렸습니다. 다급(多急)해진 황새가 「오늘도 내일(來日)도 비가 오지 않으면 목이 말라죽을 것이다.」라고 하자, 조개도 「내가 오늘도 내일(來日)도 놓지 않고 꽉 물고 있으면 너야말로 굶어 죽고 말걸.」 했습니다. 이렇게 한참 다투고 있는데, 지나가던 어부(漁夫ㆍ漁父)가 이를 보고, 힘들이지 않고 둘 다 잡아가고 말았습니다. 왕(王)은 지금 연나라(燕--)를 치려 하십니다만, 연나라(燕--)가 조개라면 조나라(趙--)는 황새입니다. 지금 연나라(燕--)와 조나라(趙--)가 공연(空然)히 싸워 국력(國力)을 소모(消耗)하면, 저 강대(強大)한 진나라(秦--)가 어부(漁夫ㆍ漁父)가 되어 맛있는 국물을 마시게 될 것입니다.」 하고 말했다. 조나라(趙--) 혜문왕(惠王)도 현명(賢明)한 까닭에 소대(蘇代)의 말을 알아듣고 연나라(燕--)를 치려던 계획(計劃ㆍ計畫)을 중단(中斷)했다고 한다."
   },
-  "scripts": "장면 1\n호스트: 어떻게 보면 어리석은 일처럼 보이지만...",
+  "scripts": "장면 1\n호스트: 여러분은 두 사람이 다투는 틈을 타서 엉뚱한 제3자가 이익을 취하는 상황을 겪어 본 적이 있으신가요? 오늘은 그런 상황을 나타내는 사자성어, 어부지리에 대해 이야기해 볼까요?\n장면 2\n호스트: 어부지리. 고기를 잡는 어부의 이익을 뜻하는 사자성어에요. 두 사람이 다투는 틈을 타서 엉뚱한 제3자가 이익을 취한다는 의미를 가지고 있어요.\n장면 3\n호스트: 어부지리의 유래는 전국시대 진나라가 여러 나라를 병탄하여 천하를 제압하려고 했던 때의 이야기에요.\n호스트: 조나라와 연나라 사이에 마찰이 생겨 조나라는 연나라를 침략하려고 준비를 하게 되었어요.\n호스트: 그때 연나라 소왕은 조나라에 소대를 보내 혜왕을 설득하도록 했어요.\n소대: 한 가지 예를 들어 혜왕을 설득해 볼게요. 어부가 볕을 쬐는 조개를 보고 황새가 조개를 쪼아먹으려고 하지만 조개는 꽉 다물어버립니다. 황새는 물이 오지 않으면 목이 말라 죽을 것이라고 말합니다. 그러자 조개는 내가 오늘도 내일도 꽉 다물고 있으면 너야말로 굶어 죽을 것이라고 대답합니다.\n소대: 이렇게 다투고 있는데 어부가 와서 둘 다 잡아가버립니다. 현재 조나라와 연나라가 싸워 국력을 소모한다면 진나라가 어부가 되어 맛있는 국물을 마시게 될 거라고 말해요.\n소대: 혜왕도 현명한 판단으로 연나라를 치려던 계획을 중단하게 되었습니다.\n장면 4\n호스트: 어부지리는 두 사람이 다투는 틈을 타서 엉뚱한 제3자가 이익을 취한다는 교훈을 전달합니다. 때로는 다투지 않고 협력하여 공동의 이익을 추구하는 것이 중요하다는 것을 알려줍니다.\n호스트: 그래서 우리는 자신의 이익만을 추구하는 것이 아니라 타인과의 협력과 팀워크를 통해 더 큰 이익을 얻을 수 있는 방법을",
   "speakers": [
     "호스트",
-    "우공"
+    "소대"
   ],
   "scenes": [
     [
       {
         "speaker": 0,
-        "content": "어떻게 보면...",
-        "audio_name": "우공이산-0-0.mp3",
-        "duration": 13.176,
-        "image_name": "우공이산-intro-0.jpeg"
+        "content": "여러분은 두 사람이 다투는 틈을 타서 엉뚱한 제3자가 이익을 취하는 상황을 겪어 본 적이 있으신가요? 오늘은 그런 상황을 나타내는 사자성어, 어부지리에 대해 이야기해 볼까요?",
+        "audio_name": "video_outputs\\어부지리\\audio-0-0.mp3",
+        "duration": 10.464,
+        "image_name": "video_outputs\\어부지리\\image-intro-0.mp4"
       }
     ],
     [
       {
         "speaker": 0,
-        "content": "우공이산. 어리석을 우, 공평할 공, 옮길 이, 산 메 산으로 이루어진 사자성어에요...",
-        "audio_name": "우공이산-1-0.mp3",
-        "duration": 14.496,
-        "image_name": "우공이산-hanja.png"
+        "content": "어부지리. 어부의 이익을 뜻하는 사자성어에요. 두 사람이 다투는 틈을 타서 엉뚱한 제3자가 이익을 취한다는 의미를 가지고 있어요.",
+        "audio_name": "video_outputs\\어부지리\\audio-1-0.mp3",
+        "duration": 8.184,
+        "image_name": "video_outputs\\어부지리\\image-hanja.png"
       }
     ],
     [
       {
         "speaker": 0,
-        "content": "우공이산의 유래는 중국 북산에 우공이라는 90세 된 노인이 살고 있었어요.",
-        "audio_name": "우공이산-2-0.mp3",
-        "duration": 4.92,
-        "image_name": "우공이산-story-0.png"
+        "content": "어부지리의 유래는 전국시대 진나라가 여러 나라를 병탄하여 천하를 제압하려고 했던 때의 이야기에요.",
+        "audio_name": "video_outputs\\어부지리\\audio-2-0.mp3",
+        "duration": 6.192,
+        "image_name": "video_outputs\\어부지리\\image-story-0.png"
       },
       {
         "speaker": 0,
-        "content": "결국 천제의 감동을 받아 산은 다른 곳으로 옮겨지게 되었답니다.",
-        "audio_name": "우공이산-2-5.mp3",
-        "duration": 4.248,
-        "image_name": "우공이산-story-5.png"
+        "content": "조나라와 연나라 사이에 마찰이 생겨 조나라는 연나라를 침략하려고 준비를 하게 되었어요. 연나라의 사신 소대는 조나라의 혜왕을 설득하기 위해 이야기 하나를 하게 돼요.",
+        "audio_name": "video_outputs\\어부지리\\audio-2-1.mp3",
+        "duration": 5.232,
+        "image_name": "video_outputs\\어부지리\\image-story-1.png"
+      },
+      {
+        "speaker": 1,
+        "content": "우연히 냇가를 봤는데, 황새가 조개를 쪼아먹으려고 하지만 조개는 입을 다물어버렸습니다. 황새는 조개에게 물이 오지 않으면 목이 말라 죽을 것이라고 말했습니다. 그러자 조개는 내가 꽉 다물고 있으면 너야말로 굶어 죽을 것이라고 대답했습니다.",
+        "audio_name": "video_outputs\\어부지리\\audio-2-3.mp3",
+        "duration": 12.312,
+        "image_name": "video_outputs\\어부지리\\image-story-2.png"
+      },
+      {
+        "speaker": 1,
+        "content": "이렇게 다투고 있는데 어부가 와서 둘 다 잡아가버립니다. 현재 조나라와 연나라가 싸워 국력을 소모한다면 진나라가 어부가 되어 맛있는 국물을 마시게 될 것입니다.",
+        "audio_name": "video_outputs\\어부지리\\audio-2-4.mp3",
+        "duration": 8.592,
+        "image_name": "video_outputs\\어부지리\\image-story-3.png"
+      },
+      {
+        "speaker": 0,
+        "content": "이에 설득된 혜왕은 연나라를 치려던 계획을 중단하게 되었습니다.",
+        "audio_name": "video_outputs\\어부지리\\audio-2-5.mp3",
+        "duration": 3.888,
+        "image_name": "video_outputs\\어부지리\\image-story-4.png"
       }
     ],
     [
       {
         "speaker": 0,
-        "content": "우공이산은 우리에게 한 가지 일에 집중하고...",
-        "audio_name": "우공이산-3-0.mp3",
-        "duration": 13.2,
-        "image_name": "우공이산-outro-0.mp4"
+        "content": "어부지리는 두 사람이 다투는 틈을 타서 엉뚱한 제3자가 이익을 취한다는 교훈을 전달합니다.",
+        "audio_name": "video_outputs\\어부지리\\audio-3-0.mp3",
+        "duration": 5.64,
+        "image_name": "video_outputs\\어부지리\\image-outro-0.mp4"
       },
       {
         "speaker": 0,
-        "content": "그래서 우리는 어떤 어려움이 있더라도...",
-        "audio_name": "우공이산-3-1.mp3",
-        "duration": 8.88,
-        "image_name": "우공이산-outro-1.mp4"
+        "content": "그래서 우리는 자신의 이익만을 추구하는 것이 아니라 타인과의 협력과 팀워크를 통해 더 큰 이익을 얻을 수 있는 방법을 생각해 봐야 해요.",
+        "audio_name": "video_outputs\\어부지리\\audio-3-1.mp3",
+        "duration": 7.776,
+        "image_name": "video_outputs\\어부지리\\image-outro-1.jpeg"
       }
     ]
-  ]
+  ],
+  "story": {
+    "summary": "A messenger persuades King Hye to stop invading Yeon nation with a story about a clam and a stork",
+    "instructions": [
+      "scene of conflict between two kingdoms, with soldiers preparing for battle",
+      "a diploma, middle-aged man standing toward King Hye, an old man sitting on his chair in his palace",
+      "scene of a stork and a clam bitting each other's mouth, at a river",
+      "scene of a fisherman, middle-aged man carrying a stork and a clam, at a river",
+      "King Hye, an old man sitting on his chair in his palace"
+    ]
+  }
 }
 ```
 
