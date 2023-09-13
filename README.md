@@ -20,6 +20,8 @@ You can edit what you want and regenerate the video, as explained [here](#regene
 - moviepy 1.0.3
 
 ## How to use
+[![](https://colab.research.google.com/assets/colab-badge.svg)](HanjaShortsGenerator_Demo.ipynb)
+
 0. make your own GCP project and get json key file. 
 0. set environment variables for GCP: `set GOOGLE_APPLICATION_CREDENTIALS=[GCP_KEY_LOCATION].json`
 0. get your own API keys for:
