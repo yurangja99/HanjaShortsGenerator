@@ -29,24 +29,19 @@ class TTS(object):
         return (list): input itself with audio name and duration. 
     """
     # read each line and get audio name and duration
-    read_scenes = []
-    for scene_idx, scene in enumerate(scenes):
-      read_scene = []
-      for line_idx, line in enumerate(scene):
-        audio_name, duration = self.speakers[line["speaker"]].read(text=line["content"], audio_name=os.path.join(dirpath, f"audio-{scene_idx}-{line_idx}"))
-        read_scene.append({
-          "speaker": line["speaker"], 
-          "content": line["content"], 
-          "audio_name": audio_name, 
-          "duration": duration
-        })
-      read_scenes.append(read_scene)
+    total_duration = 0.0
+    for scene_idx in range(len(scenes)):
+      for line_idx in range(len(scenes[scene_idx])):
+        audio_name, duration = self.speakers[scenes[scene_idx][line_idx]["speaker"]].read(text=scenes[scene_idx][line_idx]["content"], audio_name=os.path.join(dirpath, f"audio-{scene_idx}-{line_idx}"))
+        scenes[scene_idx][line_idx]["audio_name"] = audio_name
+        scenes[scene_idx][line_idx]["duration"] = duration
+        total_duration += duration
     
     # print results
-    print("TTS Result:")
-    for idx, read_scene in enumerate(read_scenes):
+    print(f"TTS Result (total {total_duration}s):")
+    for idx, read_scene in enumerate(scenes):
       print("Scene", idx + 1)
       for line in read_scene:
         print(line)
     
-    return read_scenes
+    return scenes
