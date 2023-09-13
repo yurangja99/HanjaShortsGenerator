@@ -208,6 +208,36 @@ You can edit what you want and regenerate the video, as explained [here](#regene
 python main.py 우공이산 --start-from scenes
 ```
 
+## Regenerate Image
+생성된 이미지가 마음에 들지 않거나 원하는 구도가 있는 경우, 간단한 콘티를 작성하고, `regenerate.py`를 실행하여 높은 품질의 이미지를 얻을 수 있다. 
+`regenerate.py`의 사용 방법은 아래와 같다.
+
+```commandline
+usage: regenerate.py [-h] [--strength STRENGTH] [--seed SEED] [--num-imgs NUM_IMGS] init_image prompt
+
+positional arguments:
+  init_image           기존 사진 파일 경로
+  prompt               프롬프트
+
+options:
+  -h, --help           show this help message and exit
+  --strength STRENGTH  입력 이미지의 영향력. 0일 경우 입력 이미지가 그대로 출력되며, 1일 경우 입력 이미지가 아예 고려되지 않음
+  --seed SEED          seed 값. 주어지지 않으면 랜덤
+  --num-imgs NUM_IMGS  이미지 개수
+```
+
+아래는 `regenerate.py`를 활용하여 원하는 이미지를 만들어 낸 예시이다. 
+
+강가에서 황새와 조개가 서로 입을 물고 놓아 주지 않는 상황을 그리고자 하였으나, 냇가에 황새만 서 있거나 황새와 황새가 서로 입울 물고 있는 사진만 생성되었다. 따라서, 황새만 있는 이미지에 조개 이미지를 따로 추가하여 이미지 입력으로 사용하였다. 그 결과, 오른쪽 이미지처럼 조개 이미지가 원래의 이미지와 잘 조화되도록 이미지가 생성되는 것을 볼 수 있었다. 
+
+```commandline
+python regenerate.py base.png "scene of one seashell bite a stork's beak, at a river"
+```
+
+|Prompt|Init Image|Generated Image|
+|-|-|-|
+|scene of one seashell bite a stork's beak, at a river|![](assets/regenerate0-0.png)|![](assets/regenerate0-1.png)|
+
 ## Pipeline
 ```mermaid
 flowchart TD
@@ -361,3 +391,11 @@ moviepy를 활용하여 음성과 자료 화면을 합칠 수 있었고, 비디�
 하나의 대사를 두 개의 문장 조각씩 표시하므로 자막이 넘어가는 시간이 굉장히 중요하다. 문장 조각의 길이를 전체 시간을 나누는 가중치로 고려하여 동영상을 분할하는 방식을 사용하였다. 다만 단순히 문장 조각의 길이를 사용하는 것이 아니라 ".", "!", "?"로 끝나는 문장 조각에는 4글자가 더 있는 것으로 가정하였다. (Heuristic 방법) 실험 결과, 대략적으로 타이밍이 잘 맞는 것으로 보인다. 
 
 문장 조각마다 정확한 시간을 부여하는 방식으로 간단한 파이썬 TTS 모듈인 pyttsx3를 활용하는 방법도 있다. pyttsx3를 이용하여 각 문장 조각을 읽어 보고, 그 시간을 가중치로 이용하여 전체 동영상 시간을 나누는 방법을 생각 중이다. 
+
+## To-do
+- [ ] 대본 작성 시 60초가 넘지 않도록 강제하는 기능
+- [ ] 대본 Split 시 말하는 사람의 성별을 구분할 수 있는 기능
+- [ ] ImageParser에서 중복된 이미지/동영상을 사용하지 않도록 하는 기능
+- [ ] ImageParser에서 여러 개의 후보 중 하나를 고를 수 있게 하는 기능
+- [ ] ImageConstructor에서 두 글자, 세 글자 한자어도 나타낼 수 있는 기능
+- [ ] ImageGenerator에서 여러 개의 후보 중 하나를 고를 수 있게 하는 기능
