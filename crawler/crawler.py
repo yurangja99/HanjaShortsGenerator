@@ -5,7 +5,11 @@ from selenium.webdriver.common.by import By
 class Crawler(object):
   def __init__(self):
     # Selenium chrome driver
-    self.driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    self.driver = webdriver.Chrome(options=options)
     
     # URL of NAVER hanja dictionary
     self.url = "https://hanja.dict.naver.com/#/search?query="
