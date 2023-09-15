@@ -118,17 +118,19 @@ class Editor(object):
         # add token to current line
         subtitle += f" {token}"
         subtitle = subtitle.strip()
-      if token.endswith((".", "!", "?")):
+      if token.endswith((".", "!", "?", "\"")):
         # end of the line: make new empty line
         subtitles.append(subtitle)
         subtitle = ""
+    if subtitle:
+      subtitles.append(subtitle)
     
     # triple subtitles
     subtitles = list(zip(subtitles[::2], subtitles[1::2] + [""]))
     
     # add subtitles for each clips
     sub_clips = []
-    get_subtitle_len = lambda l: sum(len(s) + (4 if s.endswith((".", "!", "?")) else 0) for s in l)
+    get_subtitle_len = lambda l: sum(len(s) + (4 if s.endswith((".", "!", "?", "\"")) else 0) for s in l)
     total_len = sum(map(get_subtitle_len, subtitles))
     start = 0
     end = 0
