@@ -12,10 +12,10 @@ class TTS(object):
     # set host as female, and most of the speakers as male. (heuristic, so can be changed)
     names = ["B", "C", "D", "A"]
     
-    assert len(speakers) <= len(names)
+    #assert len(speakers) <= len(names)
     
     # initialize Speaker instances for each speaker
-    self.speakers = [Speaker(names[i]) for i in range(len(speakers))]
+    self.speakers = [Speaker(names[0])] + [Speaker(names[((i + 2) % 3) + 1]) for i in range(1, len(speakers))]
   
   def read_script(self, scenes: list, dirpath: str):
     """
