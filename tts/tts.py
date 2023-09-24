@@ -13,6 +13,7 @@ class TTS(object):
     names = ["B", "C", "D", "A"]
     
     #assert len(speakers) <= len(names)
+    assert speakers is not None
     
     # initialize Speaker instances for each speaker
     self.speakers = [Speaker(names[0])] + [Speaker(names[((i + 2) % 3) + 1]) for i in range(1, len(speakers))]
@@ -28,6 +29,12 @@ class TTS(object):
     Return:
         return (list): input itself with audio name and duration. 
     """
+    assert scenes is not None
+    assert len(scenes) == 4
+    assert len(scenes[0]) > 0
+    assert "speaker" in scenes[0][0]
+    assert "content" in scenes[0][0]
+    
     # read each line and get audio name and duration
     total_duration = 0.0
     for scene_idx in range(len(scenes)):

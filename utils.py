@@ -82,6 +82,10 @@ def load(dirpath: str):
   Returns:
       tuple(dict, str, list, list): data, scripts, speakers, scenes
   """
+  # if no file, return None
+  if not os.path.exists(os.path.join(dirpath, "temp.json")):
+    return None, None, None, None, None
+
   # load object
   with open(os.path.join(dirpath, "temp.json"), "r", encoding="utf-8") as f:
     obj = json.load(f)

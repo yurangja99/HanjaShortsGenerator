@@ -39,44 +39,57 @@ You can edit what you want and regenerate the video, as explained [here](#regene
 0. run `main.py`
 	- usage
 		```commandline
-		usage: main.py [-h] [--start-from {keyword,data,scripts,scenes,audios,story,clips}] [--gpt-model {gpt-3.5-turbo}] [--gpt-temp GPT_TEMP] [--sd-model {stabilityai/stable-diffusion-xl-base-1.0}] [--sd-seed SD_SEED] [--width WIDTH] [--height HEIGHT] [--chalkboard CHALKBOARD] [--font FONT] [--text-chinese-size TEXT_CHINESE_SIZE] [--text-korean-size TEXT_KOREAN_SIZE] [--text-chinese-color TEXT_CHINESE_COLOR] [--fps FPS] [--text-size TEXT_SIZE] [--text-color TEXT_COLOR] [--text-stroke-width TEXT_STROKE_WIDTH] [--text-stroke-color TEXT_STROKE_COLOR] [--bgm BGM] [--bgm-vol BGM_VOL]  
-		keyword
-
-		positional arguments:
-			keyword               사자성어 혹은 고사성어
-
-		options:
-			-h, --help            show this help message and exit
-			--start-from {keyword,data,scripts,scenes,audios,story,clips}
-														영상 제작 시작 지점. (keyword: 처음부터, data: 크롤링 데이터부터, scripts: 작성된 대본부터, scenes: 장면별로 구분된 대본부터, audios: 대본, 오디오부터, story: 대본, 오디오, 이미지 설명부터, clips: 대본, 오디오, 비디오부터)
-			--gpt-model {gpt-3.5-turbo}
-														ChatGPT 모델
-			--gpt-temp GPT_TEMP   ChatGPT 모델 창의성 (0.0 ~ 1.0)
-			--sd-model {stabilityai/stable-diffusion-xl-base-1.0}
-														Stable Diffusion 모델
-			--sd-seed SD_SEED     Stable Diffusion seed값 (-1일 경우 random seed)
-			--width WIDTH         영상의 가로 길이
-			--height HEIGHT       영상의 세로 길이
-			--chalkboard CHALKBOARD
-														사자성어 소개 장면 배경. default 값 그대로 쓰는 것을 추천.
-			--font FONT           자막 폰트 파일 위치
-			--text-chinese-size TEXT_CHINESE_SIZE
-														사자성어 소개 장면 한자 크기
-			--text-korean-size TEXT_KOREAN_SIZE
-														사자성어 소개 장면 훈음 크기
-			--text-chinese-color TEXT_CHINESE_COLOR
-														사자성어 소개 장면 한자 색
-			--fps FPS             영상의 FPS
-			--text-size TEXT_SIZE
-														자막 크기
-			--text-color TEXT_COLOR
-														자막 색깔
-			--text-stroke-width TEXT_STROKE_WIDTH
-														자막 가장자리 두께
-			--text-stroke-color TEXT_STROKE_COLOR
-														자막 가장자리 색깔
-			--bgm BGM             영상 배경음악
-			--bgm-vol BGM_VOL     영상 배경음악 볼륨 조절 (0.0 ~ 1.0)
+      usage: main.py [-h] [--all] [--crawler] [--author] [--tts] [--imager] [--imager-parser] [--imager-constructor] [--imager-story]
+                    [--imager-generator] [--editor] [--gpt-model {gpt-3.5-turbo}] [--gpt-temp GPT_TEMP]
+                    [--sd-model {stabilityai/stable-diffusion-xl-base-1.0}] [--sd-seed SD_SEED] [--width WIDTH] [--height HEIGHT]
+                    [--chalkboard CHALKBOARD] [--font FONT] [--text-chinese-size TEXT_CHINESE_SIZE] [--text-korean-size TEXT_KOREAN_SIZE]
+                    [--text-chinese-color TEXT_CHINESE_COLOR] [--fps FPS] [--text-size TEXT_SIZE] [--text-color TEXT_COLOR]
+                    [--text-stroke-width TEXT_STROKE_WIDTH] [--text-stroke-color TEXT_STROKE_COLOR] [--bgm BGM] [--bgm-vol BGM_VOL]
+                    keyword
+      
+      positional arguments:
+        keyword               사자성어 혹은 고사성어
+      
+      options:
+        -h, --help            show this help message and exit
+        --all                 주어진 사자성어로부터 최종 동영상까지 모든 과정을 수행한다. (--crawler --author --tts --imager --editor 와 같다.)      
+        --crawler             Crawler 과정을 수행한다: 사자성어 관련 정보 검색
+        --author              Author 과정을 수행한다: 정보를 보고 대본 작성
+        --tts                 TTS 과정을 수행한다: 대본 음성 오디오 생성
+        --imager              Imager 과정을 수행한다: 대본에 맞는 이미지/동영상 검색/제작 (--imager-parser --image-constructor --imager-story --imager-generator와 같다.)
+        --imager-parser       Imager 중 parser 과정을 수행한다: 대본에 맞는 이미지/동영상 검색
+        --imager-constructor  Imager 중 constructor 과정을 수행한다: 대본에 맞는 한자 이미지 생성
+        --imager-story        Imager 중 generator 과정을 위한 사진 설명 생성
+        --imager-generator    Imager 중 generator 과정을 수행한다: 대본에 맞는 이미지 생성
+        --editor              Editor 과정을 수행한다: 동영상 최종 편집
+        --gpt-model {gpt-3.5-turbo}
+                              ChatGPT 모델
+        --gpt-temp GPT_TEMP   ChatGPT 모델 창의성 (0.0 ~ 1.0)
+        --sd-model {stabilityai/stable-diffusion-xl-base-1.0}
+                              Stable Diffusion 모델
+        --sd-seed SD_SEED     Stable Diffusion seed값 (-1일 경우 random seed)
+        --width WIDTH         영상의 가로 길이
+        --height HEIGHT       영상의 세로 길이
+        --chalkboard CHALKBOARD
+                              사자성어 소개 장면 배경. default 값 그대로 쓰는 것을 추천.
+        --font FONT           자막 폰트 파일 위치
+        --text-chinese-size TEXT_CHINESE_SIZE
+                              사자성어 소개 장면 한자 크기
+        --text-korean-size TEXT_KOREAN_SIZE
+                              사자성어 소개 장면 훈음 크기
+        --text-chinese-color TEXT_CHINESE_COLOR
+                              사자성어 소개 장면 한자 색
+        --fps FPS             영상의 FPS
+        --text-size TEXT_SIZE
+                              자막 크기
+        --text-color TEXT_COLOR
+                              자막 색깔
+        --text-stroke-width TEXT_STROKE_WIDTH
+                              자막 가장자리 두께
+        --text-stroke-color TEXT_STROKE_COLOR
+                              자막 가장자리 색깔
+        --bgm BGM             영상 배경음악
+        --bgm-vol BGM_VOL     영상 배경음악 볼륨 조절 (0.0 ~ 1.0)
 		```
 	- example
 		```commandline
@@ -87,8 +100,7 @@ You can edit what you want and regenerate the video, as explained [here](#regene
 			--text-chinese-size 254 ^
 			--text-korean-size 72 ^
 			--fps 30 ^
-			--text-size 72 ^
-			--start-from audios
+			--text-size 72
 
 		# OSX
 		python main.py 우공이산 \
@@ -203,11 +215,11 @@ You can edit what you want and regenerate the video, as explained [here](#regene
 }
 ```
 
-파일의 내용을 원하는 대로 수정한 다음, 다시 스크립트를 실행한다. 이때 `--start-from` 옵션을 선택해 주어야 한다. 
+파일의 내용을 원하는 대로 수정한 다음, 다시 스크립트를 실행한다. 이때 `[--all, --crawler, --author, --tts, --imager, --imager-parser, --imager-constructor, --imager-story, --imager-generator, --editor]` 중 원하는 옵션들을 선택해 주어야 한다. 
 아래의 예시는 대본의 내용이 틀렸거나 수정하고 싶을 때 음성 생성, 이미지 생성, 영상 편집을 다시 수행하는 코드이다.
 
 ```commandline
-python main.py 우공이산 --start-from scenes
+python main.py 우공이산 --tts --imager --editor
 ```
 
 ## Regenerate Image

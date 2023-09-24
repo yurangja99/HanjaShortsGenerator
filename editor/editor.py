@@ -158,9 +158,9 @@ class Editor(object):
         return (VideoClip): video clip. 
     """
     # validation
-    assert line["audio_name"] is not None
-    assert line["image_name"] is not None
-    assert line["duration"] is not None
+    assert "audio_name" in line
+    assert "image_name" in line
+    assert "content" in line
     
     # audio clip
     audio = AudioFileClip(line["audio_name"])

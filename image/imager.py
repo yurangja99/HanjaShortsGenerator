@@ -57,29 +57,21 @@ class Imager(object):
       sd_model=sd_model
     )
   
-  def image(self, data: dict, speakers: list, scenes: list, story: dict | None, seed: int | None, dirpath: str):
+  def parse(self, scenes: list, dirpath: str):
     """
-    Parse, Construct, and Generate images for given script. 
-    - parse images for scene 1 and 4. 
-    - construct an image for scene 2. 
-    - generate images for scene 3. 
+    Parse images for scene 1 and 4. 
 
     Args:
-        data (dict): data returned by crawler. 
-        speakers (list): speakers returned by splitter. 
         scenes (list): scenes returned by splitter, or tts. 
-        story (dict): if exists, use the image instructions.
-        seed (int): random seed for generator. None means random
         dirpath (str): path to save images
-
-    Returns:
-        list: scenes itself, with name of image files for each line. 
-        dict: story or generated story
+    
+    Return:
+        return (list): scenes
     """
-    # verify data
-    assert "chinese" in data
-    assert "hanja" in data
-    assert "keyword" in data
+    assert scenes is not None
+    assert len(scenes) == 4
+    assert len(scenes[0]) > 0
+    assert "content" in scenes[0][0]
     
     # scene 1, 4: parse image
     for idx, line in enumerate(scenes[0]):
@@ -93,6 +85,30 @@ class Imager(object):
         image_name=os.path.join(dirpath, f"image-outro-{idx}")
       )
     
+    print("Imager Parser Result:")
+    print(json.dumps(scenes[0], indent=2, ensure_ascii=False))
+    print(json.dumps(scenes[3], indent=2, ensure_ascii=False))
+    return scenes
+  
+  def construct(self, data: dict, scenes: list, dirpath: str):
+    """
+    Construct an image for scene 2. 
+
+    Args:
+        data (dict): data returned by crawler. 
+        scenes (list): scenes returned by splitter, or tts. 
+        dirpath (str): path to save images
+    
+    Return:
+        return (list): scenes
+    """
+    # verify data
+    assert "chinese" in data
+    assert "hanja" in data
+    assert scenes is not None
+    assert len(scenes) == 4
+    assert len(scenes[0]) > 0
+    
     # scene 2: construct image
     constructed_image_name = self.image_constructor.construct_image(
       raw_chinese=data["chinese"],
@@ -102,11 +118,54 @@ class Imager(object):
     for idx, line in enumerate(scenes[1]):
       scenes[1][idx]["image_name"] = constructed_image_name
     
+    print("Imager Constructor Result:")
+    print(json.dumps(scenes[1], indent=2, ensure_ascii=False))
+    return scenes
+  
+  def get_story(self, speakers: list, scenes: list):
+    """
+    Generate story to generate images
+
+    Args:
+        speakers (list): speakers returned by splitter. 
+        scenes (list): scenes returned by splitter, or tts. 
+
+    Returns:
+        dict: story
+    """
+    assert speakers is not None
+    assert scenes is not None
+    assert len(scenes) == 4
+    assert len(scenes[0]) > 0
+    assert "speaker" in scenes[0][0]
+    assert "content" in scenes[0][0]
+    
+    story = self.image_generator.generate_story(
+      scripts=[speakers[line["speaker"]] + ": " + line["content"] for line in scenes[2]],
+    )
+    
+    print("Imager Story:")
+    print(json.dumps(story, indent=2, ensure_ascii=False))
+    return story
+
+  def generate(self, scenes: list, story: dict, dirpath: str, seed: int | None):
+    """
+    Generate images for scene 3. 
+
+    Args:
+        scenes (list): scenes returned by splitter, or tts. 
+        story (dict): use the image instructions.
+        dirpath (str): path to save images
+        seed (int | None): random seed for generator. None means random
+        
+    Return:
+        return (list): scenes
+    """
+    assert scenes is not None
+    assert len(scenes) == 4
+    assert len(scenes[0]) > 0
+    
     # scene 3: generate image
-    if story is None:
-      story = self.image_generator.generate_story(
-        scripts=[speakers[line["speaker"]] + ": " + line["content"] for line in scenes[2]],
-      )
     generated_image_names = self.image_generator.generate_image(
       story=story,
       image_name=os.path.join(dirpath, f"image-story"),
@@ -119,7 +178,7 @@ class Imager(object):
     else:
       for idx, line in enumerate(scenes[2]):
         scenes[2][idx]["image_name"] = generated_image_names[round((len(generated_image_names) - 1) / (len(scenes[2]) - 1) * idx)]
-      
-    print("Imager Result:")
-    print(json.dumps(scenes, indent=2, ensure_ascii=False))
-    return scenes, story
+    
+    print("Imager Generator Result:")
+    print(json.dumps(scenes[2], indent=2, ensure_ascii=False))
+    return scenes

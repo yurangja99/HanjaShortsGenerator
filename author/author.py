@@ -26,11 +26,12 @@ class Author(object):
         return (str): script for given information. 
     """
     # verify info
-    assert info["keyword"] is not None
-    assert info["chinese"] is not None
-    assert info["hanja"] is not None
-    assert info["mean"] is not None
-    assert info["story"] is not None
+    assert info is not None
+    assert "keyword" in info
+    assert "chinese" in info
+    assert "hanja" in info
+    assert "mean" in info
+    assert "story" in info
     
     # due to the input length constraint, get one-shot sample
     one_shot_sample = random.sample(few_shot_samples, 1)[0]
