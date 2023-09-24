@@ -113,8 +113,12 @@ class Imager(object):
       seed=seed
     )
     #assert len(generated_image_names) == len(scenes[3])
-    for idx, line in enumerate(scenes[2]):
-      scenes[2][idx]["image_name"] = generated_image_names[round((len(generated_image_names) - 1) / (len(scenes[2]) - 1) * idx)]
+    if len(scenes[2]) == 1:
+      for idx, line in enumerate(scenes[2]):
+        scenes[2][idx]["image_name"] = generated_image_names[0]
+    else:
+      for idx, line in enumerate(scenes[2]):
+        scenes[2][idx]["image_name"] = generated_image_names[round((len(generated_image_names) - 1) / (len(scenes[2]) - 1) * idx)]
       
     print("Imager Result:")
     print(json.dumps(scenes, indent=2, ensure_ascii=False))
